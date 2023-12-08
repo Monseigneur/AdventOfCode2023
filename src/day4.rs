@@ -70,7 +70,7 @@ fn part_2(data: &str) -> u32 {
     // 1->4, 2->2, 3->2, 4->1, 5->0, 6->0
     // println!("matching_numbers {:?}", matching_numbers);
 
-    println!("num cards {}", matching_numbers.len());
+    // println!("num cards {}", matching_numbers.len());
 
     let mut card_counts = CardCounts::new(matching_numbers.len());
 

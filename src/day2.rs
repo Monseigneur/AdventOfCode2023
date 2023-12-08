@@ -1,7 +1,7 @@
 use std::fs;
 
 pub fn run() {
-    let contents = fs::read_to_string("test_files/day2/example.txt").unwrap();
+    let contents = fs::read_to_string("test_files/day2/input.txt").unwrap();
 
     let (part_1_result, part_2_result) = part_1_2_v2(&contents);
 
