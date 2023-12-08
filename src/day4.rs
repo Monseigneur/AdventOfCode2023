@@ -1,4 +1,4 @@
-use std::{fs, collections::HashSet, collections::HashMap};
+use std::{collections::HashMap, collections::HashSet, fs};
 
 pub fn run() {
     let contents = fs::read_to_string("test_files/day4/input.txt").unwrap();
@@ -49,14 +49,20 @@ fn find_matching_numbers(data: &str) -> HashMap<u32, u32> {
 
         // println!("first_piece {:?}", first_piece);
 
-        let card_title: Vec<&str> = first_piece[0].split(" ").filter(|s| !s.is_empty()).collect();
+        let card_title: Vec<&str> = first_piece[0]
+            .split(" ")
+            .filter(|s| !s.is_empty())
+            .collect();
         // println!("  card_title {:?}", card_title);
         let card_number: u32 = card_title[1].trim().parse().unwrap();
 
         let winning_numbers = parse_numbers(first_piece[1]);
         let card_numbers = parse_numbers(card_info[1]);
 
-        let intersection_size = winning_numbers.intersection(&card_numbers).collect::<Vec<&u32>>().len() as u32;
+        let intersection_size = winning_numbers
+            .intersection(&card_numbers)
+            .collect::<Vec<&u32>>()
+            .len() as u32;
 
         matching_numbers.insert(card_number, intersection_size);
     }
@@ -97,13 +103,13 @@ fn part_2(data: &str) -> u32 {
 }
 
 struct CardCounts {
-    counts: Vec<u32>
+    counts: Vec<u32>,
 }
 
 impl CardCounts {
     fn new(num_cards: usize) -> Self {
         Self {
-            counts: vec![0; num_cards]
+            counts: vec![0; num_cards],
         }
     }
 
