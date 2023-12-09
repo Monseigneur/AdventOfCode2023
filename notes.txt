@@ -18,4 +18,5 @@ Day 4:
              the algo, and then writing it correctly.
 
 Day 5:
-    - part1:
+    - part1: 2023-12-8 6:57 PM [993500720] (60819, 24815), hardest part was file parsing
+    - part2: 
