@@ -32,7 +32,12 @@ pub fn run() {
 //      SOURCE_START <= seed <= SOURCE_START + LEN - 1 -> seed - SOURCE_START + DEST_START
 
 fn part_1(data: &str) -> isize {
-    let (seeds, maps) = parse_data(data);
+    let mut line_iter = data.lines();
+
+    let seeds = parse_seeds(line_iter.next().unwrap());
+    line_iter.next();
+
+    let maps = parse_data(line_iter);
 
     let min = seeds
         .iter()
@@ -43,17 +48,18 @@ fn part_1(data: &str) -> isize {
     min
 }
 
-fn parse_data(data: &str) -> (Vec<isize>, Vec<Map>) {
-    let mut line_iter = data.lines();
+fn parse_seeds(line: &str) -> Vec<isize> {
+    let seed_numbers = line.split(":").last().unwrap();
 
-    let seeds_line = line_iter.next().unwrap().split(":").last().unwrap();
-    line_iter.next();
-
-    let seeds: Vec<isize> = seeds_line
+    let seeds: Vec<isize> = seed_numbers
         .split_ascii_whitespace()
         .map(|s| s.parse::<isize>().unwrap())
         .collect();
 
+    seeds
+}
+
+fn parse_data(mut line_iter: Lines<'_>) -> Vec<Map> {
     let mut maps = vec![];
 
     let mut map_started = false;
@@ -85,7 +91,7 @@ fn parse_data(data: &str) -> (Vec<isize>, Vec<Map>) {
         maps.push(Map::new(&map_lines));
     }
 
-    (seeds, maps)
+    maps
 }
 
 #[derive(Debug)]
@@ -157,6 +163,39 @@ fn apply_maps(seed: isize, maps: &Vec<Map>) -> isize {
     result
 }
 
-fn part_2(_data: &str) -> u32 {
-    52
+fn part_2(data: &str) -> isize {
+    let mut line_iter = data.lines();
+
+    let seeds = parse_seeds_v2(line_iter.next().unwrap());
+    line_iter.next();
+
+    let maps = parse_data(line_iter);
+
+    let min = seeds
+        .iter()
+        .map(|seed| apply_maps(*seed, &maps))
+        .min()
+        .unwrap();
+
+    min
+}
+
+fn parse_seeds_v2(line: &str) -> Vec<isize> {
+    let seed_line = line.split(":").last().unwrap();
+
+    let mut seed_numbers = seed_line
+        .split_ascii_whitespace()
+        .map(|s| s.parse::<isize>().unwrap());
+
+    let mut seeds = vec![];
+
+    while let Some(n) = seed_numbers.next() {
+        let length = seed_numbers.next().unwrap();
+
+        for i in n..(n + length) {
+            seeds.push(i);
+        }
+    }
+
+    seeds
 }
