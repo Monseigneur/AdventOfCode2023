@@ -1,12 +1,11 @@
 use std::fs;
 
+use utilities;
+
 pub fn run() {
     let contents = fs::read_to_string("test_files/day6/input.txt").unwrap();
 
-    let part_1_result = part_1(&contents);
-    let part_2_result = part_2(&contents);
-
-    println!("[Day 6]: part 1: {part_1_result}, part 2: {part_2_result}");
+    utilities::print_results(6, || part_1(&contents), || part_2(&contents));
 }
 
 // This is an algebraic optimization problem. For a given race of time T and best distance B,
