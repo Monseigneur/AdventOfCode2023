@@ -1,12 +1,12 @@
 use std::fs;
+use std::str::Lines;
+
+use utilities;
 
 pub fn run() {
-    let contents = fs::read_to_string("test_files/day5/input.txt").unwrap();
+    let contents = fs::read_to_string("test_files/day5/example.txt").unwrap();
 
-    let part_1_result = part_1(&contents);
-    let part_2_result = part_2(&contents);
-
-    println!("[Day 5]: part 1: {part_1_result}, part 2: {part_2_result}");
+    utilities::print_results(5, || part_1(&contents), || part_2(&contents));
 }
 
 // Example data:

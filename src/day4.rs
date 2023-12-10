@@ -1,12 +1,11 @@
 use std::{collections::HashMap, collections::HashSet, fs};
 
+use utilities;
+
 pub fn run() {
     let contents = fs::read_to_string("test_files/day4/input.txt").unwrap();
 
-    let part_1_result = part_1(&contents);
-    let part_2_result = part_2(&contents);
-
-    println!("[Day 4]: part 1: {part_1_result}, part 2: {part_2_result}");
+    utilities::print_results(4, || part_1(&contents), || part_2(&contents));
 }
 
 fn part_1(data: &str) -> u32 {

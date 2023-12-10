@@ -1,12 +1,11 @@
 use std::fs;
 
+use utilities;
+
 pub fn run() {
     let contents = fs::read_to_string("test_files/day1/input.txt").unwrap();
 
-    let part_1_result = part_1(&contents);
-    let part_2_result = part_2(&contents);
-
-    println!("[Day 1]: part 1: {part_1_result}, part 2: {part_2_result}");
+    utilities::print_results(1, || part_1(&contents), || part_2(&contents));
 }
 
 // Sum of first_digit_in_line * 10 + last_digit_in_line for each line
