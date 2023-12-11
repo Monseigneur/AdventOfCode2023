@@ -182,10 +182,8 @@ impl Hand {
                     2
                 }
             }
-            0 => {
-                Hand::get_hand_type(hand)
-            }
-            _ => panic!("Illegal Joker count")
+            0 => Hand::get_hand_type(hand),
+            _ => panic!("Illegal Joker count"),
         };
 
         hand_type
