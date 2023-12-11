@@ -1,33 +1,34 @@
 https://adventofcode.com/
 
 Day 1:
-    - part1: 2023-12-1 8:50 AM [54632]
-    - part2: 2023-12-1 7:30 PM [54019] (103108, 41434)
+    - part1: 2023-12-1 8:50 AM [54632, 517us] (92963)
+    - part2: 2023-12-1 7:30 PM [54019, 2.77ms] (102643)
 
 Day 2:
-    - part1: 2023-12-1 9:28 PM [2416] (4902, 1693)
-    - part2: 2023-12-1 10:05 PM [63307] (10660, 1378)
+    - part1: 2023-12-1 9:28 PM [2416] (6497)
+    - part2: 2023-12-1 10:05 PM [63307] (10611)
 
 Day 3:
-    - part1: 2023-12-5 10:56 PM [527369] (92275, 13939), this one took a while
-    - part2: 2023-12-6 8:05 PM [73074886] (97735, 14641), this one was really hard
+    - part1: 2023-12-5 10:56 PM [527369, 2.735ms] (106214), this one took a while
+    - part2: 2023-12-6 8:05 PM [73074886, 90.672ms] (97735), this one was really hard
 
 Day 4:
-    - part1: 2023-12-6 8:27 PM [25010] (94654, 12819), ez
-    - part2: 2023-12-7 8:37 PM [9924412] (99482, 13436), took a while to figure out
+    - part1: 2023-12-6 8:27 PM [25010, 4.464ms] (107473), ez
+    - part2: 2023-12-7 8:37 PM [9924412, 4.536ms] (99478), took a while to figure out
              the algo, and then writing it correctly.
 
 Day 5:
-    - part1: 2023-12-8 6:57 PM [993500720] (60819, 24815), hardest part was file parsing
-    - part2: 2023-12-8 9:30 PM [4917124] (61012, 24818), easy, but my solution took 32 minutes
+    - part1: 2023-12-8 6:57 PM [993500720] (85634), hardest part was file parsing
+    - part2: 2023-12-8 9:30 PM [4917124] (61012), easy, but my solution took 32 minutes since I
+             am just brute-forcing it.
 
 Day 6:
-    - part1: 2023-12-9 5:50 PM [633080]
-    - part2: 2023-12-9 6:03 PM [20048741] (80624, 1231), forgot to check stats on part 1. Overall easy
+    - part1: 2023-12-9 5:50 PM [633080, 21.5us] (81922)
+    - part2: 2023-12-9 6:03 PM [20048741, 5.8us] (80623), Overall easy
 
 Day 7:
-    - part1: 2023-12-9 8:14 PM [250898830, 3.3804ms] (67424, 5625), not too bad
-    - part2: 2023-12-10 3:54 PM [252127335, 6.2509ms] (64506, 5782), also not too bad
+    - part1: 2023-12-9 8:14 PM [250898830, 3.3804ms] (67424), not too bad
+    - part2: 2023-12-10 3:54 PM [252127335, 6.2509ms] (64505), also not too bad
 
 Day 8:
     - part1: 2023-12-10 4:31 PM [12599, 3.6604ms] (67818), pretty easy
