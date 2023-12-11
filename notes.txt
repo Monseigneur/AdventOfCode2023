@@ -37,3 +37,4 @@ Day 8:
 
 Day 9:
     - part1: 2023-12-10 8:09 PM [1969958987, 2.159ms] (55362), pretty easy, got stuck using usize at first
+    - part2: 2023-12-10 8:38 PM [1068, 2.262ms]  (54661), pretty easy, just had to think the subtraction order
