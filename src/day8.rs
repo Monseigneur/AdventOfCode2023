@@ -83,13 +83,18 @@ fn part_2(data: &str) -> usize {
 
     let mut results = vec![];
     for node in &current_nodes {
-        results.push(find_end(instructions, &node_map, &node, current_nodes.len()));
+        results.push(find_end(
+            instructions,
+            &node_map,
+            &node,
+            current_nodes.len(),
+        ));
     }
 
     let mut mult = 1;
     for result in results {
         mult = lcm(mult, result);
-    } 
+    }
 
     mult
 }
@@ -105,7 +110,7 @@ fn gcd(a: usize, b: usize) -> usize {
             second = second - first;
         }
     }
-    
+
     first
 }
 
@@ -117,7 +122,12 @@ fn lcm(a: usize, b: usize) -> usize {
 // node is reached at the same position through the instruction, then the entire thing is a cycle and can
 // exit early (I got this from the subreddit). Analysis of the data showed that each starting location only
 // ever reaches a single end node and cycles through it.
-fn find_end(instructions: &str, node_map: &HashMap<&str, (&str, &str)>, start: &str, max_ends: usize) -> usize {
+fn find_end(
+    instructions: &str,
+    node_map: &HashMap<&str, (&str, &str)>,
+    start: &str,
+    max_ends: usize,
+) -> usize {
     let mut end_map: HashMap<&str, usize> = HashMap::new();
     let mut end_instruction_pos: HashMap<&str, usize> = HashMap::new();
 
@@ -134,7 +144,7 @@ fn find_end(instructions: &str, node_map: &HashMap<&str, (&str, &str)>, start: &
             };
 
             count += 1;
-            current_node = new_node;  
+            current_node = new_node;
 
             // Check exit conditions.
             if new_node.ends_with('Z') {
@@ -149,7 +159,7 @@ fn find_end(instructions: &str, node_map: &HashMap<&str, (&str, &str)>, start: &
                 } else {
                     end_instruction_pos.insert(&new_node, i);
                 }
-            }          
+            }
 
             if end_map.keys().len() == max_ends {
                 break 'outer;
