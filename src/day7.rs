@@ -11,7 +11,7 @@ pub fn run() {
 
 // Sort the hands by type, breaking ties by card ranks.
 fn part_1(data: &str) -> usize {
-    let mut hands = parse_hands(data);
+    let mut hands = parse_hands(data, false);
 
     hands.sort_by(|a, b| a.partial_cmp(&b).unwrap());
 
@@ -31,8 +31,12 @@ struct Hand {
 }
 
 impl Hand {
-    fn new(hand: &str, bid: usize) -> Self {
-        let hand_type = Hand::get_hand_type(hand);
+    fn new(hand: &str, bid: usize, j_as_joker: bool) -> Self {
+        let hand_type = if j_as_joker {
+            Hand::get_hand_type_v2(hand)
+        } else {
+            Hand::get_hand_type(hand)
+        };
 
         Self {
             hand: hand.to_string(),
@@ -42,11 +46,7 @@ impl Hand {
     }
 
     fn get_hand_type(hand: &str) -> usize {
-        let mut cards: HashMap<char, usize> = HashMap::new();
-
-        for c in hand.chars() {
-            cards.entry(c).and_modify(|count| *count += 1).or_insert(1);
-        }
+        let cards = Hand::get_card_counts(hand);
 
         // Types of hands:
         // Five of a kind: 7
@@ -98,6 +98,99 @@ impl Hand {
         hand_type
     }
 
+    fn get_card_counts(hand: &str) -> HashMap<char, usize> {
+        let mut cards: HashMap<char, usize> = HashMap::new();
+
+        for c in hand.chars() {
+            cards.entry(c).and_modify(|count| *count += 1).or_insert(1);
+        }
+
+        cards
+    }
+
+    fn get_hand_type_v2(hand: &str) -> usize {
+        let cards = Hand::get_card_counts(hand);
+
+        // The presence of Jokers can upgrade the hand type by acting as
+        // other cards.
+
+        let joker_count = cards.get(&'J').unwrap_or(&0);
+
+        let mut other_cards: HashMap<char, usize> = HashMap::new();
+
+        for (card, count) in &cards {
+            if card != &'J' {
+                other_cards.insert(*card, *count);
+            }
+        }
+
+        let other_max = other_cards.values().max().unwrap_or(&0);
+        let other_min = other_cards.values().min().unwrap_or(&0);
+
+        let hand_type = match joker_count {
+            5 => {
+                // Upgrade to five of a kind
+                7
+            }
+            4 => {
+                // Upgrade to five of a kind
+                7
+            }
+            3 => {
+                // The other cards are either a one pair or singles
+                if other_max == &2 {
+                    // Upgrade to five of a kind
+                    7
+                } else {
+                    // Upgrade to four of a kind
+                    6
+                }
+            }
+            2 => {
+                // The other cards are either three of a kind, one pair, or singles
+                if other_max == &3 {
+                    // Upgrade to five of a kind
+                    7
+                } else if other_max == &2 {
+                    // Upgrade to four of a kind
+                    6
+                } else {
+                    // Upgrade to three of a kind
+                    4
+                }
+            }
+            1 => {
+                // The other cards can be a four of a kind, a three of a kind, two pair,
+                // one pair, or singles.
+                if other_max == &4 {
+                    // Upgrade to five of a kind
+                    7
+                } else if other_max == &3 {
+                    // Upgrade to four of a kind
+                    6
+                } else if other_max == &2 {
+                    // Two pair or one pair
+                    if other_min == &2 {
+                        // Two pair, upgrade to full house
+                        5
+                    } else {
+                        // One pair, upgrade to three of a kind
+                        4
+                    }
+                } else {
+                    // Singles, upgrade to one pair
+                    2
+                }
+            }
+            0 => {
+                Hand::get_hand_type(hand)
+            }
+            _ => panic!("Illegal Joker count")
+        };
+
+        hand_type
+    }
+
     fn get_card_rank(card: char) -> usize {
         match card {
             '2'..='9' => card.to_digit(10).unwrap() as usize,
@@ -108,6 +201,37 @@ impl Hand {
             'A' => 14,
             _ => panic!("Illegal card!"),
         }
+    }
+
+    fn get_card_rank_v2(card: char) -> usize {
+        // In this case, J = Joker and is the lowest individual card.
+        match card {
+            '2'..='9' => card.to_digit(10).unwrap() as usize,
+            'T' => 10,
+            'J' => 1,
+            'Q' => 12,
+            'K' => 13,
+            'A' => 14,
+            _ => panic!("Illegal card!"),
+        }
+    }
+
+    fn partial_cmp_v2(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        // Additional compare method that takes into account Jokers.
+        match self.hand_type.partial_cmp(&other.hand_type) {
+            Some(core::cmp::Ordering::Equal) => {}
+            ord => return ord,
+        }
+
+        // Compare cards individually.
+        for (a, b) in self.hand.chars().zip(other.hand.chars()) {
+            match Hand::get_card_rank_v2(a).partial_cmp(&Hand::get_card_rank_v2(b)) {
+                Some(core::cmp::Ordering::Equal) => {}
+                ord => return ord,
+            }
+        }
+
+        Some(core::cmp::Ordering::Equal)
     }
 }
 
@@ -136,7 +260,7 @@ impl PartialEq for Hand {
     }
 }
 
-fn parse_hands(data: &str) -> Vec<Hand> {
+fn parse_hands(data: &str, j_as_joker: bool) -> Vec<Hand> {
     let mut hands = vec![];
 
     for line in data.lines() {
@@ -145,12 +269,23 @@ fn parse_hands(data: &str) -> Vec<Hand> {
         let hand = pieces_iter.next().unwrap();
         let bid = pieces_iter.next().unwrap().parse::<usize>().unwrap();
 
-        hands.push(Hand::new(hand, bid));
+        hands.push(Hand::new(hand, bid, j_as_joker));
     }
 
     hands
 }
 
+// J is now a Joker, which can act as any other card to make the hand have a stronger type. For
+// matching hand types, it acts as the weakest card when comparing.
 fn part_2(data: &str) -> usize {
-    0
+    let mut hands = parse_hands(data, true);
+
+    hands.sort_by(|a, b| a.partial_cmp_v2(&b).unwrap());
+
+    let total_score = hands
+        .iter()
+        .enumerate()
+        .fold(0, |count, (i, hand)| count + (i + 1) * hand.bid);
+
+    total_score
 }
