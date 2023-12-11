@@ -26,5 +26,8 @@ Day 6:
     - part2: 2023-12-9 6:03 PM [20048741] (80624, 1231), forgot to check stats on part 1. Overall easy
 
 Day 7:
-    - part1: 2023-12-9 8:14 PM [250898830] (67424, 5625), not too bad
-    - part2: 2023-12-10 3:54 PM [252127335] (64506, 5782), also not too bad
+    - part1: 2023-12-9 8:14 PM [250898830, 3.3804ms] (67424, 5625), not too bad
+    - part2: 2023-12-10 3:54 PM [252127335, 6.2509ms] (64506, 5782), also not too bad
+
+Day 8:
+    - part1: 2023-12-10 4:31 PM [12599m 3.6604ms] (67818), pretty easy
