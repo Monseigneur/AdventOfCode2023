@@ -14,7 +14,7 @@ pub fn run() {
 // of the distances between each pair of galaxies. Note that there is some space expansion, so any
 // rows and columns that don't have any galaxies double in width.
 fn part_1(data: &str) -> usize {
-    let space = Space::new(data);
+    let space = Space::new(data, 2);
 
     calculate_distances(&space)
 }
@@ -39,7 +39,7 @@ struct Space {
 }
 
 impl Space {
-    fn new(input: &str) -> Self {
+    fn new(input: &str, expansion_factor: usize) -> Self {
         let data = input
             .lines()
             .map(|line| line.chars().collect())
@@ -48,7 +48,7 @@ impl Space {
         let galaxies = Space::find_galaxies(&data);
 
         let (row_offsets, col_offsets) =
-            Space::build_offset_tables(&galaxies, data.len(), data[0].len());
+            Space::build_offset_tables(&galaxies, expansion_factor, data.len(), data[0].len());
 
         Self {
             galaxies,
@@ -76,6 +76,7 @@ impl Space {
 
     fn build_offset_tables(
         galaxies: &HashMap<usize, Point>,
+        expansion_factor: usize,
         num_rows: usize,
         num_cols: usize,
     ) -> (Vec<usize>, Vec<usize>) {
@@ -93,13 +94,19 @@ impl Space {
             galaxy_cols.insert(location.col);
         }
 
+        // The expansion factor gives how much the empty row or column becomes (2x, 10x, etc). Since the
+        // row or column is "replaced" by that many rows or columns, and it scales from 1, the additional
+        // rows or columns are given by expansion_factor - 1 (2x -> 1 additional rows, 10x -> 9 additional 
+        // cols, etc).
+        let additional = expansion_factor - 1;
+
         let mut row_offsets = vec![];
         let mut offset = 0;
         for row in 0..num_rows {
             row_offsets.push(offset);
 
             if !galaxy_rows.contains(&row) {
-                offset += 1;
+                offset += additional;
             }
         }
 
@@ -109,7 +116,7 @@ impl Space {
             col_offsets.push(offset);
 
             if !galaxy_cols.contains(&col) {
-                offset += 1;
+                offset += additional;
             }
         }
 
@@ -160,5 +167,7 @@ fn point_delta(a: &Point, b: &Point) -> usize {
 }
 
 fn part_2(data: &str) -> usize {
-    0
+    let space = Space::new(data, 1000000);
+
+    calculate_distances(&space)
 }

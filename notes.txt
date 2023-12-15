@@ -45,3 +45,5 @@ Day 10:
 
 Day 11:
     - part1: 2023-12-14 10:44 PM [9609130, 22.153ms] (48588), fairly easy, skipped Day 10 part 2 for this one.
+    - part2: 2023-12-14 11:10 PM [702152204842, 21.534ms] (46676), really easy from part 1, just had to get the
+             expansion math right.
