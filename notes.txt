@@ -42,3 +42,6 @@ Day 9:
 Day 10:
     - part1: 2023-12-14 9:11 PM [7086, 3.438ms] (54342), a lot of code, but not too hard once I figured out
              the right algorithm.
+
+Day 11:
+    - part1: 2023-12-14 10:44 PM [9609130, 22.153ms] (48588), fairly easy, skipped Day 10 part 2 for this one.
