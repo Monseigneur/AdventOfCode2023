@@ -55,3 +55,5 @@ Day 12:
 
 Day 13:
     - part1: 2023-12-15 7:42 PM [33520, 1.052ms], not too hard, but I feel like I have the wrong approach
+    - part2: 2023-12-15 8:19 PM [34824, 3.461ms], I think I ruined the code to make it reuse, but not
+             too bad.
