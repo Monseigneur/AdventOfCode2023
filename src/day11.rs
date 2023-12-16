@@ -96,7 +96,7 @@ impl Space {
 
         // The expansion factor gives how much the empty row or column becomes (2x, 10x, etc). Since the
         // row or column is "replaced" by that many rows or columns, and it scales from 1, the additional
-        // rows or columns are given by expansion_factor - 1 (2x -> 1 additional rows, 10x -> 9 additional 
+        // rows or columns are given by expansion_factor - 1 (2x -> 1 additional rows, 10x -> 9 additional
         // cols, etc).
         let additional = expansion_factor - 1;
 
