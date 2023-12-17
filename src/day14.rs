@@ -118,105 +118,77 @@ fn build_string(data: &Data) -> String {
 
 fn apply_cycle(data: &mut Data) {
     for col in 0..data[0].len() {
-        tilt_column_north(data, col);
+        tilt_column(data, col, true);
     }
 
     for row in 0..data.len() {
-        tilt_row_west(data, row);
+        tilt_row(data, row, true);
     }
 
     for col in 0..data[0].len() {
-        tilt_column_south(data, col);
+        tilt_column(data, col, false);
     }
 
     for row in 0..data.len() {
-        tilt_row_east(data, row);
+        tilt_row(data, row, false);
     }
 }
 
-fn tilt_column_north(data: &mut Data, col: usize) {
-    let mut open_index = 0;
-
-    for row in 0..data.len() {
-        let position = row;
-
-        match data[row][col] {
-            'O' => {
-                data[position][col] = '.';
-                data[open_index][col] = 'O';
-
-                open_index += 1;
-            }
-            '#' => open_index = position + 1,
-            _ => (),
-        };
-    }
-}
-
-fn tilt_row_west(data: &mut Data, row: usize) {
-    let mut open_index = 0;
-
-    for col in 0..data[0].len() {
-        match data[row][col] {
-            'O' => {
-                data[row][col] = '.';
-                data[row][open_index] = 'O';
-
-                open_index += 1;
-            }
-            '#' => open_index = col + 1,
-            _ => (),
-        };
-    }
-}
-
-fn tilt_column_south(data: &mut Data, col: usize) {
+fn tilt_column(data: &mut Data, col: usize, north: bool) {
     let length = data.len();
-    let mut open_index = length - 1;
+    let mut open_offset = 0;
 
-    for row in 0..data.len() {
-        let position = length - row - 1;
+    for row_offset in 0..length {
+        let position = if north {
+            row_offset
+        } else {
+            length - row_offset - 1
+        };
+
+        let open_index = if north {
+            open_offset
+        } else {
+            length - 1 - open_offset
+        };
 
         match data[position][col] {
             'O' => {
                 data[position][col] = '.';
                 data[open_index][col] = 'O';
 
-                if open_index != 0 {
-                    open_index -= 1;
-                }
+                open_offset += 1;
             }
-            '#' => {
-                if position != 0 {
-                    open_index = position - 1;
-                }
-            }
+            '#' => open_offset = row_offset + 1,
             _ => (),
         };
     }
 }
 
-fn tilt_row_east(data: &mut Data, row: usize) {
+fn tilt_row(data: &mut Data, row: usize, west: bool) {
     let length = data[0].len();
-    let mut open_index = length - 1;
+    let mut open_offset = 0;
 
-    for col in 0..data[0].len() {
-        let position = length - col - 1;
+    for col_offset in 0..length {
+        let position = if west {
+            col_offset
+        } else {
+            length - col_offset - 1
+        };
+
+        let open_index = if west {
+            open_offset
+        } else {
+            length - 1 - open_offset
+        };
 
         match data[row][position] {
             'O' => {
                 data[row][position] = '.';
                 data[row][open_index] = 'O';
 
-                if open_index != 0 {
-                    open_index -= 1;
-                }
+                open_offset += 1;
             }
-            '#' => {
-                if position != 0 {
-                    open_index = position - 1;
-                }
-            }
+            '#' => open_offset = col_offset + 1,
             _ => (),
         };
     }
