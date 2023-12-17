@@ -65,3 +65,6 @@ Day 14:
              to write the code for all the directions and then found out it would take almost a day to run. I
              realized that there would be a cycle, but it took a long time to figure out how to determine where
              the cycle was.
+
+Day 15:
+    - part1: 2023-12-17 12:16 PM [517551, 622.1us], very easy.
