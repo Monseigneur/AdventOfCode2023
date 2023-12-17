@@ -61,3 +61,7 @@ Day 13:
 Day 14:
     - part1: 2023-12-16 5:19 PM [113078, 608.8us], pretty easy, I realized the dynamic programming approach but
              took a bit to get it right.
+    - part2: 2023-12-16 8:58 PM [94255, 148.214ms], this was much harder than I expected. First got stuck trying
+             to write the code for all the directions and then found out it would take almost a day to run. I
+             realized that there would be a cycle, but it took a long time to figure out how to determine where
+             the cycle was.
