@@ -31,13 +31,11 @@ fn part_1(data: &str) -> usize {
 fn process_column(data: &Data, col: usize) -> usize {
     let mut score = 0;
 
-    let length = data.len();
-
-    // Track the updated position for each item in the column, and track the latest  "wall" (where the
+    // Track the updated position for each item in the column, and track the latest "wall" (where the
     // round rocks would stop).
 
+    let length = data.len();
     let mut wall_index = length;
-    let mut updated_positions = vec![0; length];
 
     for (row, row_data) in data.iter().enumerate() {
         let position_index = length - row - 1;
@@ -54,8 +52,6 @@ fn process_column(data: &Data, col: usize) -> usize {
             '#' => wall_index = position_index,
             _ => (),
         };
-
-        updated_positions[position_index] = wall_index;
     }
 
     score
