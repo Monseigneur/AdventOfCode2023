@@ -41,6 +41,10 @@ fn part_1(data: &str) -> usize {
         .map(|line| line.chars().collect())
         .collect::<CharGrid>();
 
+    process_beams(&data, Node::new(0, 0, Node::EAST))
+}
+
+fn process_beams(data: &CharGrid, starting_node: Node) -> usize {
     // Seems like I can do BFS with the stop conditions being hitting a node in the same "direction"
     // (vertical or horizontal). The reason being that if a beam is travelling to the right, there
     // shouldn't be a need to continue exploring if a beam was on the same row going left, because
@@ -54,7 +58,7 @@ fn part_1(data: &str) -> usize {
     let mut queue: VecDeque<Node> = VecDeque::new();
     let mut visited_nodes: HashSet<Node> = HashSet::new();
 
-    queue.push_back(Node::new(0, 0, Node::EAST));
+    queue.push_back(starting_node);
 
     while !queue.is_empty() {
         let node = queue.pop_front().unwrap();
@@ -215,6 +219,27 @@ fn part_1(data: &str) -> usize {
 }
 
 fn part_2(data: &str) -> usize {
-    0
-}
+    let data = data
+        .lines()
+        .map(|line| line.chars().collect())
+        .collect::<CharGrid>();
 
+    let mut max_count = 0;
+
+    // Check columns
+    for col in 0..data[0].len() {
+        let a = process_beams(&data, Node::new(0, col, Node::SOUTH));
+        let b = process_beams(&data, Node::new(data.len() - 1, col, Node::NORTH));
+
+        max_count = max_count.max(a.max(b));
+    }
+
+    for row in 0..data.len() {
+        let a = process_beams(&data, Node::new(row, 0, Node::EAST));
+        let b = process_beams(&data, Node::new(row, data[0].len() - 1, Node::WEST));
+
+        max_count = max_count.max(a.max(b));
+    }
+
+    max_count
+}
