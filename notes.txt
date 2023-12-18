@@ -69,3 +69,6 @@ Day 14:
 Day 15:
     - part1: 2023-12-17 12:16 PM [517551, 622.1us], very easy.
     - part2: 2023-12-17 1:48 PM [286097, 3.336ms], also quite easy
+
+Day 16:
+    - part1: 2023-12-17 5:36 PM [7939, 9.644ms], not too bad once I realized how to stop the BFS.
