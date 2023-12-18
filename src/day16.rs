@@ -69,145 +69,70 @@ fn process_beams(data: &CharGrid, starting_node: Node) -> usize {
 
         covered[node.row][node.col] = 1;
 
-        match data[node.row][node.col] {
-            '.' => {
-                // Keep going in the same direction
-                match node.direction {
-                    Node::NORTH => {
-                        if node.row > 0 {
-                            queue.push_back(Node::new(node.row - 1, node.col, node.direction));
-                        }
-                    }
-                    Node::EAST => {
-                        if node.col < num_cols - 1 {
-                            queue.push_back(Node::new(node.row, node.col + 1, node.direction));
-                        }
-                    }
-                    Node::SOUTH => {
-                        if node.row < num_rows - 1 {
-                            queue.push_back(Node::new(node.row + 1, node.col, node.direction));
-                        }
-                    }
-                    Node::WEST => {
-                        if node.col > 0 {
-                            queue.push_back(Node::new(node.row, node.col - 1, node.direction));
-                        }
-                    }
-                    _ => panic!("Illegal direction!"),
-                }
-            }
+        // Depending on the tile, there may be a direction change or two directions.
+        let new_directions = match data[node.row][node.col] {
+            '.' => vec![node.direction],
             '|' => {
                 // If moving vertically, just pass through. Otherwise split.
                 match node.direction {
-                    Node::NORTH => {
-                        if node.row > 0 {
-                            queue.push_back(Node::new(node.row - 1, node.col, node.direction));
-                        }
-                    }
-                    Node::EAST | Node::WEST => {
-                        // Move up and down
-                        if node.row > 0 {
-                            queue.push_back(Node::new(node.row - 1, node.col, Node::NORTH));
-                        }
-
-                        if node.row < num_rows - 1 {
-                            queue.push_back(Node::new(node.row + 1, node.col, Node::SOUTH));
-                        }
-                    }
-                    Node::SOUTH => {
-                        if node.row < num_rows - 1 {
-                            queue.push_back(Node::new(node.row + 1, node.col, node.direction));
-                        }
-                    }
-                    _ => panic!("Illegal direction!"),
+                    Node::EAST | Node::WEST => vec![Node::NORTH, Node::SOUTH],
+                    _ => vec![node.direction],
                 }
             }
             '-' => {
                 // If moving horizontally, just pass through. Otherwise split.
                 match node.direction {
-                    Node::EAST => {
-                        if node.col < num_cols - 1 {
-                            queue.push_back(Node::new(node.row, node.col + 1, node.direction));
-                        }
-                    }
-                    Node::NORTH | Node::SOUTH => {
-                        if node.col < num_cols - 1 {
-                            queue.push_back(Node::new(node.row, node.col + 1, Node::EAST));
-                        }
-
-                        if node.col > 0 {
-                            queue.push_back(Node::new(node.row, node.col - 1, Node::WEST));
-                        }
-                    }
-                    Node::WEST => {
-                        if node.col > 0 {
-                            queue.push_back(Node::new(node.row, node.col - 1, node.direction));
-                        }
-                    }
-                    _ => panic!("Illegal direction!"),
+                    Node::NORTH | Node::SOUTH => vec![Node::EAST, Node::WEST],
+                    _ => vec![node.direction],
                 }
             }
             '/' => {
                 // Mirror 90 degrees
                 match node.direction {
-                    Node::NORTH => {
-                        // Go east
-                        if node.col < num_cols - 1 {
-                            queue.push_back(Node::new(node.row, node.col + 1, Node::EAST));
-                        }
-                    }
-                    Node::EAST => {
-                        // Go north
-                        if node.row > 0 {
-                            queue.push_back(Node::new(node.row - 1, node.col, Node::NORTH));
-                        }
-                    }
-                    Node::SOUTH => {
-                        // Go west
-                        if node.col > 0 {
-                            queue.push_back(Node::new(node.row, node.col - 1, Node::WEST));
-                        }
-                    }
-                    Node::WEST => {
-                        // Go south
-                        if node.row < num_rows - 1 {
-                            queue.push_back(Node::new(node.row + 1, node.col, Node::SOUTH));
-                        }
-                    }
+                    Node::NORTH => vec![Node::EAST],
+                    Node::EAST => vec![Node::NORTH],
+                    Node::SOUTH => vec![Node::WEST],
+                    Node::WEST => vec![Node::SOUTH],
                     _ => panic!("Illegal direction!"),
                 }
             }
             '\\' => {
                 // Mirror 90 degrees
                 match node.direction {
-                    Node::NORTH => {
-                        // Go west
-                        if node.col > 0 {
-                            queue.push_back(Node::new(node.row, node.col - 1, Node::WEST));
-                        }
-                    }
-                    Node::EAST => {
-                        // Go south
-                        if node.row < num_rows - 1 {
-                            queue.push_back(Node::new(node.row + 1, node.col, Node::SOUTH));
-                        }
-                    }
-                    Node::SOUTH => {
-                        // Go east
-                        if node.col < num_cols - 1 {
-                            queue.push_back(Node::new(node.row, node.col + 1, Node::EAST));
-                        }
-                    }
-                    Node::WEST => {
-                        // Go north
-                        if node.row > 0 {
-                            queue.push_back(Node::new(node.row - 1, node.col, Node::NORTH));
-                        }
-                    }
+                    Node::NORTH => vec![Node::WEST],
+                    Node::EAST => vec![Node::SOUTH],
+                    Node::SOUTH => vec![Node::EAST],
+                    Node::WEST => vec![Node::NORTH],
                     _ => panic!("Illegal direction!"),
                 }
             }
             _ => panic!("Illegal tile!"),
+        };
+
+        for direction in new_directions {
+            match direction {
+                Node::NORTH => {
+                    if node.row > 0 {
+                        queue.push_back(Node::new(node.row - 1, node.col, direction));
+                    }
+                }
+                Node::EAST => {
+                    if node.col < num_cols - 1 {
+                        queue.push_back(Node::new(node.row, node.col + 1, direction));
+                    }
+                }
+                Node::SOUTH => {
+                    if node.row < num_rows - 1 {
+                        queue.push_back(Node::new(node.row + 1, node.col, direction));
+                    }
+                }
+                Node::WEST => {
+                    if node.col > 0 {
+                        queue.push_back(Node::new(node.row, node.col - 1, direction));
+                    }
+                }
+                _ => panic!("Illegal direction!"),
+            }
         }
 
         visited_nodes.insert(node);
