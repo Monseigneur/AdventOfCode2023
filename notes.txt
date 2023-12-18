@@ -42,7 +42,7 @@ Day 9:
 Day 10:
     - part1: 2023-12-14 9:11 PM [7086, 3.438ms] (54342), a lot of code, but not too hard once I figured out
              the right algorithm.
-    - part2: 2023-12-17 8:55 PM [317, 10.036ms], the nastiest code I have ever written in this challenge.
+    - part2: 2023-12-17 8:55 PM [317, 10.036ms] (42249), the nastiest code I have ever written in this challenge.
 
 Day 11:
     - part1: 2023-12-14 10:44 PM [9609130, 22.153ms] (48588), fairly easy, skipped Day 10 part 2 for this one.
@@ -54,22 +54,22 @@ Day 12:
     - part2:
 
 Day 13:
-    - part1: 2023-12-15 7:42 PM [33520, 1.052ms], not too hard, but I feel like I have the wrong approach
-    - part2: 2023-12-15 8:19 PM [34824, 3.461ms], I think I ruined the code to make it reuse, but not
+    - part1: 2023-12-15 7:42 PM [33520, 1.052ms] (33726), not too hard, but I feel like I have the wrong approach
+    - part2: 2023-12-15 8:19 PM [34824, 3.461ms] (29438), I think I ruined the code to make it reuse, but not
              too bad.
 
 Day 14:
-    - part1: 2023-12-16 5:19 PM [113078, 608.8us], pretty easy, I realized the dynamic programming approach but
+    - part1: 2023-12-16 5:19 PM [113078, 608.8us] (34676), pretty easy, I realized the dynamic programming approach but
              took a bit to get it right.
-    - part2: 2023-12-16 8:58 PM [94255, 148.214ms], this was much harder than I expected. First got stuck trying
+    - part2: 2023-12-16 8:58 PM [94255, 148.214ms] (28707), this was much harder than I expected. First got stuck trying
              to write the code for all the directions and then found out it would take almost a day to run. I
              realized that there would be a cycle, but it took a long time to figure out how to determine where
              the cycle was.
 
 Day 15:
-    - part1: 2023-12-17 12:16 PM [517551, 622.1us], very easy.
-    - part2: 2023-12-17 1:48 PM [286097, 3.336ms], also quite easy
+    - part1: 2023-12-17 12:16 PM [517551, 622.1us] (35977), very easy.
+    - part2: 2023-12-17 1:48 PM [286097, 3.336ms] (32635), also quite easy
 
 Day 16:
-    - part1: 2023-12-17 5:36 PM [7939, 9.644ms], not too bad once I realized how to stop the BFS.
-    - part2: 2023-12-17 5:48 PM [8318, 2.325s], just applied the part1 algorithm in a loop around the edges.
+    - part1: 2023-12-17 5:36 PM [7939, 9.644ms] (27390), not too bad once I realized how to stop the BFS.
+    - part2: 2023-12-17 5:48 PM [8318, 2.325s] (26549), just applied the part1 algorithm in a loop around the edges.
