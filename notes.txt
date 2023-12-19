@@ -50,7 +50,7 @@ Day 11:
              expansion math right.
 
 Day 12:
-    - part1:
+    - part1: 2023-12-18 8:57 PM [7110, 10.169s] (39691), the dirtiest crappiest algorithm you have ever seen.
     - part2:
 
 Day 13:
