@@ -1,2 +1,4 @@
 /target
 .vscode
+/test_files/**/input.txt
+/prompts
