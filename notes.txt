@@ -50,8 +50,11 @@ Day 11:
              expansion math right.
 
 Day 12:
-    - part1: 2023-12-18 8:57 PM [7110, 10.169s] (39691), the dirtiest crappiest algorithm you have ever seen.
-    - part2:
+    - part1: 2023-12-18 8:57 PM [7110, 15.53ms] (39691), the dirtiest crappiest algorithm you have ever seen.
+             Updated to use the algorithm from part 2.
+    - part2: 2023-12-22 8:55 PM [1566786613613, 256.977ms] (28012), I had to look at the subreddit to understand the
+             algorithm. I did think about an edit distance algorithm, but I couldn't remember how to implement it or
+             how to apply it here.
 
 Day 13:
     - part1: 2023-12-15 7:42 PM [33520, 1.052ms] (33726), not too hard, but I feel like I have the wrong approach

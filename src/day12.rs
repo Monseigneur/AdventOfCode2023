@@ -16,93 +16,83 @@ fn part_1(data: &str) -> usize {
         .map(|line| {
             let pieces = line.split_ascii_whitespace().collect::<Vec<&str>>();
 
-            process_spring_data(pieces[0], pieces[1])
+            process_spring_data_v2(pieces[0], pieces[1])
         })
         .sum()
 }
 
-// Notes:
-// - Perhaps counting springs is useful, at least for an upper bound?
-//      - damaged_info.sum() - damaged_count = max damaged springs in Y '?' tiles
-//
-
-fn process_spring_data(spring_info: &str, damaged_info: &str) -> usize {
-    let (broken_springs, total_broken) = get_broken_springs(damaged_info);
-
-    let unknown_count = spring_info.chars().filter(|&c| c == '?').count();
-    let known_broken = spring_info.chars().filter(|&c| c == '#').count();
-
-    let broken_in_unknown = total_broken - known_broken;
-
-    let mut unknown_indexes = vec![];
-
-    for (i, c) in spring_info.char_indices() {
-        if c == '?' {
-            unknown_indexes.push(i);
-        }
-    }
-
-    let mut total = 0;
-    let mut spring = spring_info.chars().collect::<Vec<char>>();
-
-    // There are unknown_count choose broken_in_unknown ways to fill in the broken springs. Try them all.
-    let max = (1 << unknown_count) - 1;
-
-    'outer: for i in 0..=max {
-        let mut count = 0;
-        let mut index = 0;
-
-        let mut val = i;
-
-        for _ in 0..unknown_count {
-            spring[unknown_indexes[index]] = if val % 2 != 0 {
-                count += 1;
-
-                if count > broken_in_unknown {
-                    continue 'outer;
-                }
-
-                '#'
-            } else {
-                '.'
-            };
-
-            index += 1;
-
-            val = val >> 1;
-        }
-
-        let s = spring.iter().collect::<String>();
-
-        if check_pattern(&s, &broken_springs) {
-            total += 1;
-        }
-    }
-
-    total
-}
-
-fn get_broken_springs(damaged_info: &str) -> (Vec<usize>, usize) {
-    let broken_springs = damaged_info
-        .split(",")
-        .map(|s| s.parse::<usize>().unwrap())
-        .collect::<Vec<usize>>();
-
-    let sum = broken_springs.iter().sum();
-
-    (broken_springs, sum)
-}
-
-fn check_pattern(pattern: &str, broken_springs: &Vec<usize>) -> bool {
-    let pattern_vec = pattern
-        .split(".")
-        .filter(|s| !s.is_empty())
-        .map(|s| s.len())
-        .collect::<Vec<usize>>();
-
-    &pattern_vec == broken_springs
-}
-
+// The patterns are repeated 5 times each, with a '?' separating the spring parts, and a ',' separating the broken
+// spring runs.
 fn part_2(data: &str) -> usize {
-    0
+    let mut count = 0;
+
+    for line in data.lines() {
+        let pieces = line.split_ascii_whitespace().collect::<Vec<&str>>();
+
+        let mut spring_info = pieces[0].to_owned();
+        let mut damaged_info = pieces[1].to_owned();
+
+        for _ in 0..4 {
+            spring_info.push('?');
+            spring_info.push_str(pieces[0]);
+            damaged_info.push(',');
+            damaged_info.push_str(pieces[1]);
+        }
+
+        count += process_spring_data_v2(&spring_info, &damaged_info);
+    }
+
+    count
+}
+
+fn process_spring_data_v2(spring_info: &str, damaged_info: &str) -> usize {
+    let mut springs = ".".to_owned();
+    springs.push_str(spring_info);
+    springs.push_str(".");
+
+    let mut damaged = vec![false];
+
+    damaged_info.split(",").for_each(|s| {
+        let val = s.parse::<usize>().unwrap();
+
+        for _ in 0..val {
+            damaged.push(true);
+        }
+
+        damaged.push(false);
+    });
+
+    let springs_len = springs.len();
+    let damaged_len = damaged.len();
+
+    let mut table: Vec<Vec<usize>> = vec![vec![0; damaged_len + 1]; springs_len + 1];
+    table[springs_len][damaged_len] = 1;
+
+    for i in (0..springs_len).rev() {
+        for j in (0..damaged_len).rev() {
+            let mut is_damaged = false;
+            let mut is_operational = false;
+
+            match springs.as_bytes()[i] {
+                b'#' => is_damaged = true,
+                b'.' => is_operational = true,
+                b'?' => {
+                    is_damaged = true;
+                    is_operational = true;
+                }
+                _ => panic!("Illegal character"),
+            }
+
+            let mut sum = 0;
+            if is_damaged && damaged[j] {
+                sum += table[i + 1][j + 1];
+            } else if is_operational && !damaged[j] {
+                sum += table[i + 1][j + 1] + table[i + 1][j];
+            }
+
+            table[i][j] = sum;
+        }
+    }
+
+    table[0][0]
 }
