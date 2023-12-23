@@ -76,3 +76,6 @@ Day 15:
 Day 16:
     - part1: 2023-12-17 5:36 PM [7939, 9.644ms] (27390), not too bad once I realized how to stop the BFS.
     - part2: 2023-12-17 5:48 PM [8318, 2.325s] (26549), just applied the part1 algorithm in a loop around the edges.
+
+Day 19:
+    - part1: 2023-12-23 12:25 PM [432427, 2.794ms] (25826), a lot of code, but rather simple.
