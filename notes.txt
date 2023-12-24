@@ -78,7 +78,7 @@ Day 16:
     - part2: 2023-12-17 5:48 PM [8318, 2.325s] (26549), just applied the part1 algorithm in a loop around the edges.
 
 Day 18:
-    - part1: 2023-12-23 9:15 PM [432427, 1.981s] (26377), started off with a slow flood fill algorithm like in day 10.
+    - part1: 2023-12-23 9:15 PM [76387, 1.981s] (26377), started off with a slow flood fill algorithm like in day 10.
 
 Day 19:
     - part1: 2023-12-23 12:25 PM [432427, 2.794ms] (25826), a lot of code, but rather simple.
