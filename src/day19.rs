@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet, VecDeque};
 use std::fs;
 
 use utilities;
@@ -98,7 +98,6 @@ impl Part {
             Variable::M => self.m,
             Variable::A => self.a,
             Variable::S => self.s,
-            _ => panic!("Illegal variable"),
         }
     }
 
@@ -229,6 +228,181 @@ fn process_part(part: &Part, instruction_map: &HashMap<String, InstructionNode>)
     }
 }
 
+// Instead of sorting parts by the ratings, determine instead the number of combinations of ratings
+// that will yield an accepted part, assuming that each of the four ratings can be 1 to 4000.
+//
+// The example and input data appear to be DAGs and only branch; only the A and R nodes have more than
+// one other node pointing to them. This means that each node should just cut up the input range they
+// receive to send to each of their neighbors, so the ranges can be pushed through to figure out what
+// ranges reach the A node.
 fn part_2(data: &str) -> usize {
-    0
+    let (instructions, _) = parse_input(data);
+
+    let instruction_map = parse_instructions(&instructions);
+
+    // Do a BFS through the graph to calculate the ranges for each node and what reaches the Accepted state.
+    let mut in_ranges: HashMap<&str, RatingRange> = HashMap::new();
+    let mut a_ranges = vec![];
+
+    let mut queue: VecDeque<&str> = VecDeque::new();
+    let mut visited_nodes: HashSet<&str> = HashSet::new();
+
+    let starting_node = "in";
+
+    queue.push_back(starting_node);
+    in_ranges.insert(&starting_node, RatingRange::default());
+
+    while !queue.is_empty() {
+        let node = queue.pop_front().unwrap();
+
+        if visited_nodes.contains(&node) {
+            continue;
+        }
+
+        let node_instructions = instruction_map.get(node).unwrap();
+
+        // Find the neighbors and build the ranges for them.
+        // For a given neighbor, there are a few ranges to consider:
+        //  - The in_range for the current node.
+        //  - The instruction_range containing what the instruction to the neighbor calls for.
+        //  - The else_range containing the inverses of the previous instructions.
+
+        let mut else_range = RatingRange::default();
+
+        for instruction in node_instructions.instructions.iter() {
+            let mut instruction_range = RatingRange::default();
+            let mut instruction_else_range = RatingRange::default();
+
+            if !instruction.unconditional {
+                match instruction.var {
+                    Variable::X => {
+                        if instruction.lt {
+                            // var < limit -> 1..limit
+                            // else range: var >= limit -> limit..4001
+                            instruction_range.x.max = instruction.limit;
+                            instruction_else_range.x.min = instruction.limit;
+                        } else {
+                            // var > limit -> (limit + 1)..4001
+                            // else range: var <= limit -> 1..(limit + 1)
+                            instruction_range.x.min = instruction.limit + 1;
+                            instruction_else_range.x.max = instruction.limit + 1;
+                        }
+                    }
+                    Variable::M => {
+                        if instruction.lt {
+                            instruction_range.m.max = instruction.limit;
+                            instruction_else_range.m.min = instruction.limit;
+                        } else {
+                            instruction_range.m.min = instruction.limit + 1;
+                            instruction_else_range.m.max = instruction.limit + 1;
+                        }
+                    }
+                    Variable::A => {
+                        if instruction.lt {
+                            instruction_range.a.max = instruction.limit;
+                            instruction_else_range.a.min = instruction.limit;
+                        } else {
+                            instruction_range.a.min = instruction.limit + 1;
+                            instruction_else_range.a.max = instruction.limit + 1;
+                        }
+                    }
+                    Variable::S => {
+                        if instruction.lt {
+                            instruction_range.s.max = instruction.limit;
+                            instruction_else_range.s.min = instruction.limit;
+                        } else {
+                            instruction_range.s.min = instruction.limit + 1;
+                            instruction_else_range.s.max = instruction.limit + 1;
+                        }
+                    }
+                }
+            }
+
+            let in_range = in_ranges.get(node).unwrap();
+
+            let dest_range = in_range
+                .intersection(&instruction_range)
+                .intersection(&else_range);
+
+            if instruction.dest == "A" {
+                a_ranges.push((node, dest_range));
+            } else if instruction.dest != "R" {
+                in_ranges.insert(&instruction.dest, dest_range);
+                queue.push_back(&instruction.dest);
+            }
+
+            else_range = else_range.intersection(&instruction_else_range);
+        }
+
+        visited_nodes.insert(node);
+    }
+
+    a_ranges.iter().map(|(_, range)| range.size()).sum()
+}
+
+#[derive(Debug)]
+struct Range {
+    min: usize,
+    max: usize,
+}
+
+impl Range {
+    fn new(min: usize, max: usize) -> Self {
+        Self { min, max }
+    }
+
+    fn default() -> Self {
+        Range::new(1, 4001)
+    }
+
+    fn intersection(&self, other: &Range) -> Self {
+        let mut min = 0;
+        let mut max = 0;
+
+        if self.min <= other.min && other.min < self.max {
+            min = other.min;
+            max = self.max.min(other.max);
+        } else if other.min <= self.min && self.min < other.max {
+            min = self.min;
+            max = self.max.min(other.max);
+        }
+
+        Self { min, max }
+    }
+
+    fn size(&self) -> usize {
+        self.max - self.min
+    }
+}
+
+#[derive(Debug)]
+struct RatingRange {
+    x: Range,
+    m: Range,
+    a: Range,
+    s: Range,
+}
+
+impl RatingRange {
+    fn default() -> Self {
+        let x = Range::default();
+        let m = Range::default();
+        let a = Range::default();
+        let s = Range::default();
+
+        Self { x, m, a, s }
+    }
+
+    fn intersection(&self, other: &RatingRange) -> Self {
+        Self {
+            x: self.x.intersection(&other.x),
+            m: self.m.intersection(&other.m),
+            a: self.a.intersection(&other.a),
+            s: self.s.intersection(&other.s),
+        }
+    }
+
+    fn size(&self) -> usize {
+        self.x.size() * self.m.size() * self.a.size() * self.s.size()
+    }
 }

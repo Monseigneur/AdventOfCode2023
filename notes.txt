@@ -79,3 +79,5 @@ Day 16:
 
 Day 19:
     - part1: 2023-12-23 12:25 PM [432427, 2.794ms] (25826), a lot of code, but rather simple.
+    - part2: 2023-12-23 7:53 PM [143760172569135, 3.655ms] (19181), also a lot of code since I couldn't really reuse my part1
+             solution for the most part. Took a while to figure out the bugs.
