@@ -87,3 +87,6 @@ Day 19:
 
 Day 21:
     - part1: 2023-12-24 12:53 PM [3830, 15.079ms] (21043), not too bad, realized a good approach fairly quickly.
+
+Day 24:
+    - part1: 2023-12-27 8:39 PM [19523, 2.691 ms] (14104), just algebra, but I went the long way around.
