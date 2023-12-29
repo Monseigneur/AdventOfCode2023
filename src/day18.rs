@@ -46,7 +46,7 @@ impl Point {
     fn new_from_other(other: &Point) -> Self {
         Self {
             row: other.row,
-            col: other.col
+            col: other.col,
         }
     }
 }
@@ -66,7 +66,7 @@ impl Direction {
             "R" => Self::Right,
             "D" => Self::Down,
             "L" => Self::Left,
-            _ => panic!("Illegal string!")
+            _ => panic!("Illegal string!"),
         }
     }
 }
@@ -75,7 +75,7 @@ impl Direction {
 struct Dig {
     direction: Direction,
     distance: usize,
-    color: String
+    color: String,
 }
 
 impl Dig {
@@ -86,7 +86,39 @@ impl Dig {
         let distance = plan_pieces[1].parse::<usize>().unwrap();
         let color = plan_pieces[2].to_owned();
 
-        Self { direction, distance, color }
+        Self {
+            direction,
+            distance,
+            color,
+        }
+    }
+
+    fn new2(line: &str) -> Self {
+        let plan_pieces = line.split_ascii_whitespace().collect::<Vec<&str>>();
+
+        let color_piece = plan_pieces[2]
+            .strip_prefix("(#")
+            .unwrap()
+            .strip_suffix(")")
+            .unwrap();
+
+        let distance = usize::from_str_radix(&color_piece[0..(color_piece.len() - 1)], 16).unwrap();
+
+        let direction = match &color_piece[(color_piece.len() - 1)..] {
+            "0" => Direction::Right,
+            "1" => Direction::Down,
+            "2" => Direction::Left,
+            "3" => Direction::Up,
+            _ => panic!("Illegal direction"),
+        };
+
+        let color = plan_pieces[2].to_owned();
+
+        Self {
+            direction,
+            distance,
+            color,
+        }
     }
 }
 
@@ -194,7 +226,7 @@ fn flood_fill(grid: &mut CharGrid) {
     }
 }
 
-fn fill_around(grid: &mut CharGrid, row: usize, col: usize) -> usize{
+fn fill_around(grid: &mut CharGrid, row: usize, col: usize) -> usize {
     let current_tile = grid[row][col];
 
     if current_tile != 'O' {
@@ -226,6 +258,102 @@ fn fill_around(grid: &mut CharGrid, row: usize, col: usize) -> usize{
     count
 }
 
-fn part_2(_data: &str) -> usize {
-    0
+// The elves misinterpreted the input data, and instead the color field is the important information, where
+// the first 5 hex digits give the distance, and the last hex digit gives the direction.
+fn part_2(data: &str) -> usize {
+    let dig_plan = parse_input2(data);
+
+    calculate_area(&dig_plan)
+}
+
+fn parse_input2(data: &str) -> Vec<Dig> {
+    data.lines().map(|line| Dig::new2(line)).collect()
+}
+
+#[derive(Debug)]
+struct IPoint {
+    x: isize,
+    y: isize,
+}
+
+impl IPoint {
+    fn new(x: isize, y: isize) -> Self {
+        Self { x, y }
+    }
+
+    fn apply(&self, direction: &Direction, distance: usize) -> Self {
+        let distance = distance as isize;
+
+        match direction {
+            Direction::Up => Self {
+                y: self.y + distance,
+                ..*self
+            },
+            Direction::Right => Self {
+                x: self.x + distance,
+                ..*self
+            },
+            Direction::Down => Self {
+                y: self.y - distance,
+                ..*self
+            },
+            Direction::Left => Self {
+                x: self.x - distance,
+                ..*self
+            },
+        }
+    }
+}
+
+fn calculate_area(dig_plan: &Vec<Dig>) -> usize {
+    let mut right_count: usize = 0;
+    let mut left_count: usize = 0;
+
+    let mut current = IPoint::new(0, 0);
+
+    let mut inner_area = 0;
+    let mut edge_area = 0;
+
+    for i in 0..dig_plan.len() {
+        let dig = &dig_plan[i];
+
+        let next = current.apply(&dig.direction, dig.distance);
+
+        inner_area += current.x * next.y - current.y * next.x;
+
+        // Calculate the edge area
+        edge_area += dig.distance;
+
+        let j = (i + 1) % dig_plan.len();
+
+        // Count the number of each turn, to determine which side is "outside".
+        if is_right_turn(dig, &dig_plan[j]) {
+            right_count += 1;
+        } else {
+            left_count += 1;
+        }
+
+        current = next;
+    }
+
+    let total_area = inner_area.abs() as usize + edge_area + right_count.abs_diff(left_count) / 2;
+
+    total_area / 2
+}
+
+fn is_right_turn(dig: &Dig, next_dig: &Dig) -> bool {
+    let first_dir = &dig.direction;
+    let second_dir = &next_dig.direction;
+
+    match (first_dir, second_dir) {
+        (Direction::Up, Direction::Right) => true,
+        (Direction::Up, Direction::Left) => false,
+        (Direction::Right, Direction::Down) => true,
+        (Direction::Right, Direction::Up) => false,
+        (Direction::Down, Direction::Left) => true,
+        (Direction::Down, Direction::Right) => false,
+        (Direction::Left, Direction::Up) => true,
+        (Direction::Left, Direction::Down) => false,
+        _ => panic!("Illegal direction combo"),
+    }
 }
