@@ -1,5 +1,5 @@
 use std::{
-    collections::{HashMap, VecDeque},
+    collections::{HashMap, HashSet, VecDeque},
     fs,
 };
 
@@ -446,6 +446,85 @@ fn gather_state(modules: &Modules) -> (usize, usize, String) {
     (low_pulse_count, high_pulse_count, all_state)
 }
 
+// Determine how many button pushes is required to receive a low pulse at rx.
 fn part_2(data: &str) -> usize {
-    0
+    let mut modules = parse_modules(data);
+
+    // Analysis of the input showed that there are 4 separate chains that come together to produce the final
+    // result at rx, so find the cycle of each one.
+    let stop_modules = vec!["xm", "tr", "dr", "nh"];
+    let stop_modules = stop_modules.iter().fold(HashSet::new(), |mut acc, s| {
+        acc.insert(s.to_string());
+        return acc;
+    });
+
+    let mut found_stop_modules = HashMap::new();
+
+    let mut push_count: usize = 1;
+    while found_stop_modules.len() != stop_modules.len() {
+        if let Some(stop_module) = push_once_with_stop(&mut modules, &stop_modules) {
+            found_stop_modules.insert(stop_module, push_count);
+        }
+
+        push_count += 1;
+    }
+
+    let mut cycle_lcm = 1;
+    for cycle_len in found_stop_modules.values() {
+        cycle_lcm = lcm(cycle_lcm, *cycle_len);
+    }
+
+    cycle_lcm
+}
+
+fn push_once_with_stop(modules: &mut Modules, stop_modules: &HashSet<String>) -> Option<String> {
+    let mut stop_module = None;
+
+    let mut queue: VecDeque<Pulse> = VecDeque::new();
+
+    if let Some(Module::Button(button)) = modules.get_mut("button") {
+        queue.push_back(button.start());
+    }
+
+    while let Some(pulse) = queue.pop_front() {
+        if !pulse.high_pulse && stop_modules.contains(&pulse.end) {
+            stop_module = Some(pulse.end.to_string());
+        }
+
+        // Apply the pulse to the destination module, which can generate more pulses
+        if let Some(dest_module) = modules.get_mut(&pulse.end) {
+            let new_pulses = match dest_module {
+                Module::Broadcast(broadcast) => broadcast.apply(&pulse),
+                Module::FlipFlop(flipflop) => flipflop.apply(&pulse),
+                Module::Conjunction(conjunction) => conjunction.apply(&pulse),
+                _ => panic!("Illegal destination for pulse!"),
+            };
+
+            // Add the new pulses to the queue.
+            new_pulses
+                .into_iter()
+                .for_each(|pulse| queue.push_back(pulse));
+        }
+    }
+
+    stop_module
+}
+
+fn gcd(a: usize, b: usize) -> usize {
+    let mut first = a;
+    let mut second = b;
+
+    while first != second {
+        if first > second {
+            first = first - second;
+        } else {
+            second = second - first;
+        }
+    }
+
+    first
+}
+
+fn lcm(a: usize, b: usize) -> usize {
+    a / gcd(a, b) * b
 }

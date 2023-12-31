@@ -90,6 +90,8 @@ Day 19:
 
 Day 20:
     - part1: 2023-12-30 4:24 PM [763500168, 70.279ms] (21264), a lot of code because I went too hard on the OO design.
+    - part2: 2023-12-30 7:40 PM [207652583562007, 195.264] (16990), calculated it by hand first. Wrote the algorithm to
+             calculate it for my input.
 
 Day 21:
     - part1: 2023-12-24 12:53 PM [3830, 15.079ms] (21043), not too bad, realized a good approach fairly quickly.
