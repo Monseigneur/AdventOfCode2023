@@ -181,7 +181,7 @@ impl Conjunction {
         // high pulse, send a low pulse. Otherwise send a high pulse.
 
         let mut all_inputs_high = true;
-    
+
         for (i, input) in self.inputs.iter().enumerate() {
             if input == &pulse.start {
                 self.input_last_pulse[i] = pulse.high_pulse;
@@ -207,8 +207,12 @@ impl Conjunction {
     }
 
     fn get_state(&self) -> String {
-        let input_state = self.inputs.iter().zip(self.input_last_pulse.iter()).map(|(input, last)| 
-            input.clone() + &bool_str(*last)).fold(String::new(), |acc, s| acc + &s);
+        let input_state = self
+            .inputs
+            .iter()
+            .zip(self.input_last_pulse.iter())
+            .map(|(input, last)| input.clone() + &bool_str(*last))
+            .fold(String::new(), |acc, s| acc + &s);
 
         self.name.clone() + &input_state
     }
@@ -284,7 +288,10 @@ fn parse_modules(data: &str) -> Modules {
 
                 conjunction_modules.insert(module_name.to_string(), vec![]);
 
-                (module_name, Module::Conjunction(Conjunction::new(module_name, &pieces[1..])))
+                (
+                    module_name,
+                    Module::Conjunction(Conjunction::new(module_name, &pieces[1..])),
+                )
             }
             _ => panic!("Illegal module name"),
         };
@@ -300,15 +307,14 @@ fn parse_modules(data: &str) -> Modules {
             Module::Broadcast(broadcast) => &broadcast.destinations,
             Module::FlipFlop(flipflop) => &flipflop.destinations,
             Module::Conjunction(conjunction) => &conjunction.destinations,
-            _ => continue,    // Button modules can't point to a conjunction module.
+            _ => continue, // Button modules can't point to a conjunction module.
         };
 
-        destinations
-            .iter()
-            .for_each(|dest| {
-                conjunction_modules
-                    .entry(dest.clone())
-                    .and_modify(|v| v.push(name.clone())); });
+        destinations.iter().for_each(|dest| {
+            conjunction_modules
+                .entry(dest.clone())
+                .and_modify(|v| v.push(name.clone()));
+        });
     }
 
     // Now add all of those modules to their respective conjunction module inputs.
@@ -324,7 +330,7 @@ fn parse_modules(data: &str) -> Modules {
 }
 
 fn count_pulses(modules: &mut Modules, push_button_count: usize) -> usize {
-    let (_,  _, initial_state) = gather_state(modules);
+    let (_, _, initial_state) = gather_state(modules);
 
     let mut state_map = HashMap::new();
 
@@ -425,7 +431,9 @@ fn gather_state(modules: &Modules) -> (usize, usize, String) {
         let ((low, high), state) = match module {
             Module::Broadcast(broadcast) => (broadcast.get_pulses_sent(), broadcast.get_state()),
             Module::FlipFlop(flipflop) => (flipflop.get_pulses_sent(), flipflop.get_state()),
-            Module::Conjunction(conjunction) => (conjunction.get_pulses_sent(), conjunction.get_state()),
+            Module::Conjunction(conjunction) => {
+                (conjunction.get_pulses_sent(), conjunction.get_state())
+            }
             Module::Button(button) => (button.get_pulses_sent(), button.get_state()),
         };
 
