@@ -88,6 +88,9 @@ Day 19:
     - part2: 2023-12-23 7:53 PM [143760172569135, 3.655ms] (19181), also a lot of code since I couldn't really reuse my part1
              solution for the most part. Took a while to figure out the bugs.
 
+Day 20:
+    - part1: 2023-12-30 4:24 PM [763500168, 70.279ms] (21264), a lot of code because I went too hard on the OO design.
+
 Day 21:
     - part1: 2023-12-24 12:53 PM [3830, 15.079ms] (21043), not too bad, realized a good approach fairly quickly.
 
