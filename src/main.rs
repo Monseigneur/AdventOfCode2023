@@ -11,6 +11,7 @@ mod day19;
 mod day2;
 mod day20;
 mod day21;
+mod day22;
 mod day24;
 mod day3;
 mod day4;
@@ -19,7 +20,6 @@ mod day6;
 mod day7;
 mod day8;
 mod day9;
-mod day22;
 
 fn main() {
     println!("Advent of code 2023");
