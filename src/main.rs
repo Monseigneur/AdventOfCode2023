@@ -19,6 +19,7 @@ mod day6;
 mod day7;
 mod day8;
 mod day9;
+mod day22;
 
 fn main() {
     println!("Advent of code 2023");
@@ -43,5 +44,6 @@ fn main() {
     day19::run();
     day20::run();
     day21::run();
+    day22::run();
     day24::run();
 }
