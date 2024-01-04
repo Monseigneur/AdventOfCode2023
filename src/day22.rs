@@ -1,4 +1,4 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::{HashMap, HashSet, VecDeque};
 use std::fs;
 use std::ops::Range;
 
@@ -136,6 +136,14 @@ fn get_final_bricks(falling_bricks: &Vec<Brick>) -> Vec<Brick> {
 }
 
 fn count_disintegrated_bricks(bricks: &Vec<Brick>) -> usize {
+    let bricks_below = get_bricks_below(bricks);
+
+    let required_bricks = get_required_bricks(&bricks_below);
+
+    bricks.len() - required_bricks.len()
+}
+
+fn get_bricks_below(bricks: &Vec<Brick>) -> HashMap<BrickId, HashSet<BrickId>> {
     // Determine the brick arrangements in each column.
     let mut heights: HashMap<(usize, usize), HashMap<usize, BrickId>> = HashMap::new();
 
@@ -181,20 +189,91 @@ fn count_disintegrated_bricks(bricks: &Vec<Brick>) -> usize {
         bricks_below.insert(brick.id, below);
     }
 
+    bricks_below
+}
+
+fn get_required_bricks(bricks_below: &HashMap<BrickId, HashSet<BrickId>>) -> HashSet<BrickId> {
     // If any brick has only 1 brick below, than that below brick is required.
-    let mut required_bricks = HashSet::new();
+    let mut required_bricks: HashSet<BrickId> = HashSet::new();
 
-    for (_, below) in &bricks_below {
+    for (_, below) in bricks_below {
         if below.len() == 1 {
-            let required = below.iter().next().unwrap();
+            let required: &BrickId = below.iter().next().unwrap();
 
-            required_bricks.insert(required);
+            required_bricks.insert(*required);
         }
     }
 
-    bricks.len() - required_bricks.len()
+    required_bricks
 }
 
+// For each brick, determine the number of bricks that would fall if the given brick was disintegrated, and calculate
+// the sum of all bricks that would fall.
 fn part_2(data: &str) -> usize {
-    0
+    let falling_bricks = parse_input(data);
+
+    let bricks = get_final_bricks(&falling_bricks);
+
+    let bricks_below = get_bricks_below(&bricks);
+    let bricks_above = get_bricks_above(&bricks_below);
+
+    let required_bricks = get_required_bricks(&bricks_below);
+
+    required_bricks
+        .iter()
+        .map(|brick| count_above(*brick, &bricks_above, &bricks_below))
+        .sum()
+}
+
+fn get_bricks_above(
+    bricks_below: &HashMap<BrickId, HashSet<BrickId>>,
+) -> HashMap<BrickId, HashSet<BrickId>> {
+    let mut bricks_above = HashMap::new();
+
+    for (brick, below) in bricks_below {
+        for below_brick in below {
+            if !bricks_above.contains_key(below_brick) {
+                bricks_above.insert(*below_brick, HashSet::new());
+            }
+
+            bricks_above.get_mut(below_brick).unwrap().insert(*brick);
+        }
+    }
+
+    bricks_above
+}
+
+fn count_above(
+    start_brick: BrickId,
+    bricks_above: &HashMap<BrickId, HashSet<BrickId>>,
+    bricks_below: &HashMap<BrickId, HashSet<BrickId>>,
+) -> usize {
+    let mut visited = HashSet::new();
+    let mut falling = HashSet::new();
+
+    let mut queue = VecDeque::new();
+    falling.insert(start_brick);
+    queue.push_back(start_brick);
+
+    while let Some(brick) = queue.pop_front() {
+        if visited.contains(&brick) {
+            continue;
+        }
+
+        if let Some(above) = bricks_above.get(&brick) {
+            for other_brick in above {
+                // Other brick may be supported by another supported tower.
+                let below = bricks_below.get(other_brick).unwrap();
+
+                if falling.is_superset(below) {
+                    falling.insert(*other_brick);
+                    queue.push_back(*other_brick);
+                }
+            }
+        }
+
+        visited.insert(brick);
+    }
+
+    falling.len() - 1
 }
