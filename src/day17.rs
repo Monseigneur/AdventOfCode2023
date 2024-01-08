@@ -1,3 +1,4 @@
+use std::cmp::Reverse;
 use std::collections::BinaryHeap;
 use std::collections::HashMap;
 use std::collections::HashSet;
@@ -6,7 +7,7 @@ use std::fs;
 use utilities;
 
 pub fn run() {
-    let contents = fs::read_to_string("test_files/day17/example.txt").unwrap();
+    let contents = fs::read_to_string("test_files/day17/input.txt").unwrap();
 
     utilities::print_results(17, || part_1(&contents), || part_2(&contents));
 }
@@ -73,28 +74,6 @@ impl Point {
     }
 }
 
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
-struct State {
-    heat: usize,
-    position: Point,
-    block_dist: BlockDist,
-}
-
-impl Ord for State {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        other
-            .heat
-            .cmp(&self.heat)
-            .then_with(|| self.position.cmp(&other.position))
-    }
-}
-
-impl PartialOrd for State {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        Some(self.cmp(other))
-    }
-}
-
 fn part_1(data: &str) -> usize {
     let grid = parse_input(data);
 
@@ -106,18 +85,9 @@ fn part_1(data: &str) -> usize {
 
     let mut queue = BinaryHeap::new();
 
-    queue.push(State {
-        heat: 0,
-        position: start_point,
-        block_dist: BlockDist::start(),
-    });
+    queue.push((Reverse(0), start_point, BlockDist::start()));
 
-    while let Some(State {
-        heat,
-        position,
-        block_dist,
-    }) = queue.pop()
-    {
+    while let Some((Reverse(heat), position, block_dist)) = queue.pop() {
         if position == end_point {
             return heat;
         }
@@ -138,22 +108,16 @@ fn part_1(data: &str) -> usize {
         for (neighbor, new_block_dist) in get_neighbors(&grid, &position, &block_dist) {
             let neighbor_heat = heat + get_heat_loss(&grid, &neighbor);
 
-            let next = State {
-                heat: neighbor_heat,
-                position: neighbor,
-                block_dist: new_block_dist,
-            };
-
             if heat_map
                 .get(&(neighbor, new_block_dist))
-                .is_some_and(|&best_heat| best_heat < next.heat)
+                .is_some_and(|&best_heat| best_heat < neighbor_heat)
             {
                 continue;
             }
 
-            queue.push(next);
+            queue.push((Reverse(neighbor_heat), neighbor, new_block_dist));
 
-            heat_map.insert((neighbor, new_block_dist), next.heat);
+            heat_map.insert((neighbor, new_block_dist), neighbor_heat);
         }
 
         visited.insert(key);
