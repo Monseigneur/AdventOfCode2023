@@ -77,6 +77,9 @@ Day 16:
     - part1: 2023-12-17 5:36 PM [7939, 9.644ms] (27390), not too bad once I realized how to stop the BFS.
     - part2: 2023-12-17 5:48 PM [8318, 2.325s] (26549), just applied the part1 algorithm in a loop around the edges.
 
+Day 17:
+    - part1: 2024-1-7 6:52 PM [902, 940.2ms] (24689), I just couldn't get this problem at all.
+
 Day 18:
     - part1: 2023-12-23 9:15 PM [76387, 505.3us] (26377), started off with a slow flood fill algorithm like in day 10.
              Updated to use the algorithm from part 2.
