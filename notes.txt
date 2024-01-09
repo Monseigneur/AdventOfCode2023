@@ -79,6 +79,8 @@ Day 16:
 
 Day 17:
     - part1: 2024-1-7 6:52 PM [902, 940.2ms] (24689), I just couldn't get this problem at all.
+    - part2: 2024-1-8 6:14 PM [1073, 2.867s] (23663), Took a while to tweak part 1 to make this work, but I think I still
+             have a bug.
 
 Day 18:
     - part1: 2023-12-23 9:15 PM [76387, 505.3us] (26377), started off with a slow flood fill algorithm like in day 10.

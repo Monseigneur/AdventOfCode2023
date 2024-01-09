@@ -41,13 +41,14 @@ impl BlockDist {
         }
     }
 
-    fn new_from_direction(&self, direction: Direction) -> Option<Self> {
+    fn new_from_direction(&self, direction: Direction, min_steps: usize, max_steps: usize) -> Option<Self> {
         if self.direction != direction {
-            Some(Self {
-                direction,
-                steps: 1,
-            })
-        } else if self.steps < 3 {
+            if self.steps < min_steps && self.steps != 0 {
+                None
+            } else {
+                Some(Self { direction, steps: 1 })
+            }
+        } else if self.steps < max_steps {
             Some(Self {
                 direction,
                 steps: self.steps + 1,
@@ -72,11 +73,35 @@ impl Point {
     fn default() -> Self {
         Self { row: 0, col: 0 }
     }
+
+    fn new_from_direction(&self, direction: Direction) -> Self {
+        match direction {
+            Direction::Up => Self { row: self.row - 1, ..*self },
+            Direction::Right => Self { col: self.col + 1, ..*self },
+            Direction::Down => Self { row: self.row + 1, ..*self },
+            Direction::Left => Self { col: self.col - 1, ..*self },
+            _ => Self { ..*self }
+        }
+    }
 }
 
 fn part_1(data: &str) -> usize {
     let grid = parse_input(data);
 
+    minimum_heat(&grid, 1, 3)
+}
+
+fn parse_input(data: &str) -> Grid {
+    data.lines()
+        .map(|line| {
+            line.chars()
+                .map(|c| c.to_digit(10).unwrap() as usize)
+                .collect()
+        })
+        .collect::<Grid>()
+}
+
+fn minimum_heat(grid: &Grid, min_steps: usize, max_steps: usize) -> usize {
     let start_point = Point::default();
     let end_point = Point::new(grid.len() - 1, grid[0].len() - 1);
 
@@ -105,7 +130,7 @@ fn part_1(data: &str) -> usize {
             continue;
         }
 
-        for (neighbor, new_block_dist) in get_neighbors(&grid, &position, &block_dist) {
+        for (neighbor, new_block_dist) in get_neighbors(&grid, &position, &block_dist, min_steps, max_steps) {
             let neighbor_heat = heat + get_heat_loss(&grid, &neighbor);
 
             if heat_map
@@ -123,47 +148,60 @@ fn part_1(data: &str) -> usize {
         visited.insert(key);
     }
 
-    unreachable!()
+    panic!("Didn't find a path to the end!");
 }
 
-fn parse_input(data: &str) -> Grid {
-    data.lines()
-        .map(|line| {
-            line.chars()
-                .map(|c| c.to_digit(10).unwrap() as usize)
-                .collect()
-        })
-        .collect::<Grid>()
-}
-
-fn get_neighbors(grid: &Grid, point: &Point, block_dist: &BlockDist) -> Vec<(Point, BlockDist)> {
+fn get_neighbors(grid: &Grid, point: &Point, block_dist: &BlockDist, min_steps: usize, max_steps: usize) -> Vec<(Point, BlockDist)> {
     let mut neighbors = vec![];
 
+    let is_start = block_dist.direction == Direction::Start;
+    let can_turn = is_start || block_dist.steps >= min_steps;
+
     // Up
-    if point.row > 0 && block_dist.direction != Direction::Down {
-        if let Some(new_block_dist) = block_dist.new_from_direction(Direction::Up) {
-            neighbors.push((Point::new(point.row - 1, point.col), new_block_dist));
+    if block_dist.direction != Direction::Down {
+        let new_direction = Direction::Up;
+        let far_from_edge = point.row >= min_steps;
+
+        if point.row > 0 && (block_dist.direction == new_direction || (can_turn && far_from_edge)) {
+            if let Some(new_block_dist) = block_dist.new_from_direction(new_direction, min_steps, max_steps) {
+                neighbors.push((point.new_from_direction(new_direction), new_block_dist));
+            }
         }
     }
 
     // Right
-    if point.col < grid[0].len() - 1 && block_dist.direction != Direction::Left {
-        if let Some(new_block_dist) = block_dist.new_from_direction(Direction::Right) {
-            neighbors.push((Point::new(point.row, point.col + 1), new_block_dist));
+    if block_dist.direction != Direction::Left {
+        let new_direction = Direction::Right;
+        let far_from_edge = point.col <= grid[0].len() - min_steps;
+
+        if point.col < grid[0].len() - 1 && (block_dist.direction == new_direction || (can_turn && far_from_edge)) {
+            if let Some(new_block_dist) = block_dist.new_from_direction(Direction::Right, min_steps, max_steps) {
+                neighbors.push((point.new_from_direction(Direction::Right), new_block_dist));
+            }
         }
     }
 
     // Down
-    if point.row < grid.len() - 1 && block_dist.direction != Direction::Up {
-        if let Some(new_block_dist) = block_dist.new_from_direction(Direction::Down) {
-            neighbors.push((Point::new(point.row + 1, point.col), new_block_dist));
+    if block_dist.direction != Direction::Up {
+        let new_direction = Direction::Down;
+        let far_from_edge = point.row <= grid.len() - min_steps;
+
+        if point.row < grid.len() - 1 && (block_dist.direction == new_direction || (can_turn && far_from_edge)) {
+            if let Some(new_block_dist) = block_dist.new_from_direction(Direction::Down, min_steps, max_steps) {
+                neighbors.push((point.new_from_direction(Direction::Down), new_block_dist));
+            }
         }
     }
 
     // Left
-    if point.col > 0 && block_dist.direction != Direction::Right {
-        if let Some(new_block_dist) = block_dist.new_from_direction(Direction::Left) {
-            neighbors.push((Point::new(point.row, point.col - 1), new_block_dist));
+    if block_dist.direction != Direction::Right {
+        let new_direction = Direction::Left;
+        let far_from_edge = point.col >= min_steps;
+
+        if point.col > 0 && (block_dist.direction == new_direction || (can_turn && far_from_edge)) {
+            if let Some(new_block_dist) = block_dist.new_from_direction(Direction::Left, min_steps, max_steps) {
+                neighbors.push((point.new_from_direction(Direction::Left), new_block_dist));
+            }
         }
     }
 
@@ -177,6 +215,10 @@ fn get_heat_loss(grid: &Grid, point: &Point) -> usize {
     grid[point.row][point.col]
 }
 
-fn part_2(_data: &str) -> usize {
-    0
+// The crucibles have been upgraded, but now they can only move a minimum of 4 blocks in a direction, and a max
+// of 10.
+fn part_2(data: &str) -> usize {
+    let grid = parse_input(data);
+
+    minimum_heat(&grid, 4, 10)
 }
