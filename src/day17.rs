@@ -41,28 +41,14 @@ impl BlockDist {
         }
     }
 
-    fn new_from_direction(
-        &self,
-        direction: Direction,
-        min_steps: usize,
-        max_steps: usize,
-    ) -> Option<Self> {
-        if self.direction != direction {
-            if self.steps < min_steps && self.steps != 0 {
-                None
-            } else {
-                Some(Self {
-                    direction,
-                    steps: 1,
-                })
-            }
-        } else if self.steps < max_steps {
-            Some(Self {
-                direction,
-                steps: self.steps + 1,
-            })
-        } else {
-            None
+    fn new(direction: Direction, steps: usize) -> Self {
+        Self { direction, steps }
+    }
+
+    fn advance(&self) -> Self {
+        Self {
+            steps: self.steps + 1,
+            ..*self
         }
     }
 }
@@ -82,26 +68,16 @@ impl Point {
         Self { row: 0, col: 0 }
     }
 
-    fn new_from_direction(&self, direction: Direction) -> Self {
-        match direction {
-            Direction::Up => Self {
-                row: self.row - 1,
-                ..*self
-            },
-            Direction::Right => Self {
-                col: self.col + 1,
-                ..*self
-            },
-            Direction::Down => Self {
-                row: self.row + 1,
-                ..*self
-            },
-            Direction::Left => Self {
-                col: self.col - 1,
-                ..*self
-            },
-            _ => Self { ..*self },
-        }
+    fn new_from_direction(&self, direction: Direction, dist: usize) -> Self {
+        let (row, col) = match direction {
+            Direction::Up => (self.row - dist, self.col),
+            Direction::Right => (self.row, self.col + dist),
+            Direction::Down => (self.row + dist, self.col),
+            Direction::Left => (self.row, self.col - dist),
+            _ => (self.row, self.col),
+        };
+
+        Self { row, col }
     }
 }
 
@@ -153,7 +129,7 @@ fn minimum_heat(grid: &Grid, min_steps: usize, max_steps: usize) -> usize {
         for (neighbor, new_block_dist) in
             get_neighbors(&grid, &position, &block_dist, min_steps, max_steps)
         {
-            let neighbor_heat = heat + get_heat_loss(&grid, &neighbor);
+            let neighbor_heat = heat + get_heat_loss(grid, &position, &neighbor);
 
             if heat_map
                 .get(&(neighbor, new_block_dist))
@@ -183,18 +159,26 @@ fn get_neighbors(
     let mut neighbors = vec![];
 
     let is_start = block_dist.direction == Direction::Start;
-    let can_turn = is_start || block_dist.steps >= min_steps;
 
     // Up
     if block_dist.direction != Direction::Down {
         let new_direction = Direction::Up;
         let far_from_edge = point.row >= min_steps;
 
-        if point.row > 0 && (block_dist.direction == new_direction || (can_turn && far_from_edge)) {
-            if let Some(new_block_dist) =
-                block_dist.new_from_direction(new_direction, min_steps, max_steps)
-            {
-                neighbors.push((point.new_from_direction(new_direction), new_block_dist));
+        if is_start || block_dist.direction != new_direction {
+            // This case shouldn't happen, but let's write it for consistency.
+            if far_from_edge {
+                let new_block_dist = BlockDist::new(new_direction, min_steps);
+                let new_point = point.new_from_direction(new_direction, min_steps);
+
+                neighbors.push((new_point, new_block_dist));
+            }
+        } else {
+            if point.row > 0 && block_dist.steps < max_steps {
+                let new_block_dist = block_dist.advance();
+                let new_point = point.new_from_direction(new_direction, 1);
+
+                neighbors.push((new_point, new_block_dist));
             }
         }
     }
@@ -202,15 +186,21 @@ fn get_neighbors(
     // Right
     if block_dist.direction != Direction::Left {
         let new_direction = Direction::Right;
-        let far_from_edge = point.col <= grid[0].len() - min_steps;
+        let far_from_edge = point.col < grid[0].len() - min_steps;
 
-        if point.col < grid[0].len() - 1
-            && (block_dist.direction == new_direction || (can_turn && far_from_edge))
-        {
-            if let Some(new_block_dist) =
-                block_dist.new_from_direction(Direction::Right, min_steps, max_steps)
-            {
-                neighbors.push((point.new_from_direction(Direction::Right), new_block_dist));
+        if is_start || block_dist.direction != new_direction {
+            if far_from_edge {
+                let new_block_dist = BlockDist::new(new_direction, min_steps);
+                let new_point = point.new_from_direction(new_direction, min_steps);
+
+                neighbors.push((new_point, new_block_dist));
+            }
+        } else {
+            if point.col < grid[0].len() - 1 && block_dist.steps < max_steps {
+                let new_block_dist = block_dist.advance();
+                let new_point = point.new_from_direction(new_direction, 1);
+
+                neighbors.push((new_point, new_block_dist));
             }
         }
     }
@@ -218,15 +208,21 @@ fn get_neighbors(
     // Down
     if block_dist.direction != Direction::Up {
         let new_direction = Direction::Down;
-        let far_from_edge = point.row <= grid.len() - min_steps;
+        let far_from_edge = point.row < grid.len() - min_steps;
 
-        if point.row < grid.len() - 1
-            && (block_dist.direction == new_direction || (can_turn && far_from_edge))
-        {
-            if let Some(new_block_dist) =
-                block_dist.new_from_direction(Direction::Down, min_steps, max_steps)
-            {
-                neighbors.push((point.new_from_direction(Direction::Down), new_block_dist));
+        if is_start || block_dist.direction != new_direction {
+            if far_from_edge {
+                let new_block_dist = BlockDist::new(new_direction, min_steps);
+                let new_point = point.new_from_direction(new_direction, min_steps);
+
+                neighbors.push((new_point, new_block_dist));
+            }
+        } else {
+            if point.row < grid.len() - 1 && block_dist.steps < max_steps {
+                let new_block_dist = block_dist.advance();
+                let new_point = point.new_from_direction(new_direction, 1);
+
+                neighbors.push((new_point, new_block_dist));
             }
         }
     }
@@ -236,11 +232,20 @@ fn get_neighbors(
         let new_direction = Direction::Left;
         let far_from_edge = point.col >= min_steps;
 
-        if point.col > 0 && (block_dist.direction == new_direction || (can_turn && far_from_edge)) {
-            if let Some(new_block_dist) =
-                block_dist.new_from_direction(Direction::Left, min_steps, max_steps)
-            {
-                neighbors.push((point.new_from_direction(Direction::Left), new_block_dist));
+        if is_start || block_dist.direction != new_direction {
+            // This case shouldn't happen, but let's write it for consistency.
+            if far_from_edge {
+                let new_block_dist = BlockDist::new(new_direction, min_steps);
+                let new_point = point.new_from_direction(new_direction, min_steps);
+
+                neighbors.push((new_point, new_block_dist));
+            }
+        } else {
+            if point.col > 0 && block_dist.steps < max_steps {
+                let new_block_dist = block_dist.advance();
+                let new_point = point.new_from_direction(new_direction, 1);
+
+                neighbors.push((new_point, new_block_dist));
             }
         }
     }
@@ -248,11 +253,28 @@ fn get_neighbors(
     neighbors
 }
 
-fn get_heat_loss(grid: &Grid, point: &Point) -> usize {
-    assert!(point.row < grid.len());
-    assert!(point.col < grid[0].len());
+fn get_heat_loss(grid: &Grid, start: &Point, end: &Point) -> usize {
+    assert!(start.row < grid.len());
+    assert!(start.col < grid[0].len());
 
-    grid[point.row][point.col]
+    assert!(end.row < grid.len());
+    assert!(end.col < grid[0].len());
+
+    let min_row = start.row.min(end.row);
+    let max_row = start.row.max(end.row);
+
+    let min_col = start.col.min(end.col);
+    let max_col = start.col.max(end.col);
+
+    let mut heat = 0;
+
+    for r in min_row..=max_row {
+        for c in min_col..=max_col {
+            heat += grid[r][c];
+        }
+    }
+
+    heat - grid[start.row][start.col]
 }
 
 // The crucibles have been upgraded, but now they can only move a minimum of 4 blocks in a direction, and a max
