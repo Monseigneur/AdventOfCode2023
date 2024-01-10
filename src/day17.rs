@@ -108,9 +108,11 @@ fn minimum_heat(grid: &Grid, min_steps: usize, max_steps: usize) -> usize {
 
     queue.push((Reverse(0), start_point, BlockDist::start()));
 
+    let mut best_heat = None;
     while let Some((Reverse(heat), position, block_dist)) = queue.pop() {
         if position == end_point {
-            return heat;
+            best_heat = Some(heat);
+            break;
         }
 
         if heat_map
@@ -146,7 +148,7 @@ fn minimum_heat(grid: &Grid, min_steps: usize, max_steps: usize) -> usize {
         visited.insert(key);
     }
 
-    panic!("Didn't find a path to the end!");
+    best_heat.unwrap()
 }
 
 fn get_neighbors(
