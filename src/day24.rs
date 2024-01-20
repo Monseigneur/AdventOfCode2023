@@ -162,6 +162,7 @@ fn part_2(data: &str) -> usize {
 fn gather_equations(hailstones: &[Hailstone]) -> Vec<Vec<f64>> {
     let mut equations = vec![];
 
+    // Probably can do better than this, like choosing values that are linearly independent.
     'outer: for ai in 0..(hailstones.len() - 1) {
         for bi in (ai + 2)..hailstones.len() {
             let a = &hailstones[ai];
