@@ -12,6 +12,7 @@ pub fn run() {
 }
 
 type CharGrid = Vec<Vec<char>>;
+type Graph = HashMap<Point, Vec<(Point, usize)>>;
 
 // Given a map of hiking trails, find the longest hike from the start to the end without going back
 // over tiles already visited.
@@ -131,8 +132,10 @@ fn walk_path(grid: &CharGrid, start: &Point, direction: &Direction) -> (Point, u
             break;
         }
 
-        current_direction = neighbors[0].0.direction_from(&current);
-        current = neighbors[0].0;
+        let (neighbor, _) = neighbors[0];
+
+        current_direction = neighbor.direction_from(&current);
+        current = neighbor;
 
         step_count += 1;
     }
@@ -140,7 +143,7 @@ fn walk_path(grid: &CharGrid, start: &Point, direction: &Direction) -> (Point, u
     (current, step_count, current_direction)
 }
 
-fn build_graph(grid: &CharGrid, start: &Point) -> HashMap<Point, Vec<(Point, usize)>> {
+fn build_graph(grid: &CharGrid, start: &Point) -> Graph {
     let mut graph = HashMap::new();
     let mut paths = VecDeque::new();
 
@@ -182,7 +185,7 @@ fn build_graph(grid: &CharGrid, start: &Point) -> HashMap<Point, Vec<(Point, usi
     graph
 }
 
-fn topological_sort(graph: &HashMap<Point, Vec<(Point, usize)>>) -> Vec<Point> {
+fn topological_sort(graph: &Graph) -> Vec<Point> {
     let size = graph.keys().len();
 
     let mut sorted = vec![];
@@ -200,12 +203,7 @@ fn topological_sort(graph: &HashMap<Point, Vec<(Point, usize)>>) -> Vec<Point> {
     sorted
 }
 
-fn visit(
-    graph: &HashMap<Point, Vec<(Point, usize)>>,
-    node: &Point,
-    sorted: &mut Vec<Point>,
-    visited: &mut HashSet<Point>,
-) {
+fn visit(graph: &Graph, node: &Point, sorted: &mut Vec<Point>, visited: &mut HashSet<Point>) {
     if visited.contains(node) {
         return;
     }
@@ -220,12 +218,7 @@ fn visit(
     sorted.push(*node);
 }
 
-fn find_longest_path(
-    graph: &HashMap<Point, Vec<(Point, usize)>>,
-    sorted: Vec<Point>,
-    start: &Point,
-    end: &Point,
-) -> usize {
+fn find_longest_path(graph: &Graph, sorted: Vec<Point>, start: &Point, end: &Point) -> usize {
     let mut distances: HashMap<&Point, usize> = HashMap::new();
 
     distances.insert(start, 0);
@@ -252,6 +245,66 @@ fn find_longest_path(
     *distances.get(end).unwrap()
 }
 
+// The slope parts aren't as slippery, so you can go up them. What is the longest path in this case? The graph
+// is now an undirected graph.
 fn part_2(data: &str) -> usize {
-    0
+    let grid: CharGrid = data.lines().map(|line| line.chars().collect()).collect();
+
+    let (start, end) = find_ends(&grid);
+
+    let directed_graph = build_graph(&grid, &start);
+    let graph = fill_graph(directed_graph);
+
+    dfs(&graph, &start, &end, &mut HashSet::new(), 0)
+}
+
+fn fill_graph(directed_graph: Graph) -> Graph {
+    let mut graph = HashMap::new();
+
+    for (point, neighbors) in directed_graph {
+        // for each point, add its neighbors, and add itself to each of it's neighbor's edges.
+        for (neighbor, dist) in neighbors.iter() {
+            let value = (point, *dist);
+            graph
+                .entry(*neighbor)
+                .and_modify(|v: &mut Vec<(Point, usize)>| v.push(value))
+                .or_insert(vec![value]);
+        }
+
+        graph
+            .entry(point)
+            .and_modify(|v| v.extend(neighbors.iter()))
+            .or_insert(neighbors);
+    }
+
+    graph
+}
+
+fn dfs(
+    graph: &Graph,
+    current: &Point,
+    end: &Point,
+    visited: &mut HashSet<Point>,
+    dist: usize,
+) -> usize {
+    if current == end {
+        return dist;
+    }
+
+    let mut end_distances = vec![];
+
+    // Get neighbors of current and try them all if they haven't been visited yet.
+    let neighbors = graph.get(current).unwrap();
+
+    for (neighbor, neighbor_dist) in neighbors {
+        if visited.contains(neighbor) {
+            continue;
+        }
+
+        visited.insert(*neighbor);
+        end_distances.push(dfs(graph, neighbor, end, visited, dist + neighbor_dist));
+        visited.remove(neighbor);
+    }
+
+    *end_distances.iter().max().unwrap_or(&0)
 }
