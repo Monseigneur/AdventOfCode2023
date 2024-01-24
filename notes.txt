@@ -100,6 +100,9 @@ Day 20:
 
 Day 21:
     - part1: 2023-12-24 12:53 PM [3830, 15.079ms] (21043), not too bad, realized a good approach fairly quickly.
+    - part2: 2024-1-23 12:45 AM [637087163925555, 513.926ms] (14572), really couldn't get it with brute force, looked up
+             some information and saw that it repeats, then did analysis of the data and calculated the result on
+             paper.
 
 Day 22:
     - part1: 2024-1-1 7:56 PM [465, 11.2ms] (15804), not too bad either, just had to think about the arrangements.
