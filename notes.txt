@@ -118,3 +118,7 @@ Day 24:
     - part2: 2024-1-12 11:18 PM [566373506408017, 7.669ms] (11763), more heavy algebra, I had to look up someone's notes on the
              problem. However, I was getting rounding errors but narrowed my result space to only 9, so was able to
              guess the right answer :/. I only got the answer after bringing in a crate for rational numbers with big integers.
+
+Day 25:
+    - part1: 2024-7-5 9:28 PM [601344, 45.203s] (14723), didn't pick this back up until June. Had no idea what to do until I got
+             some hints from the subreddit, all my previous ways were way too slow.
