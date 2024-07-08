@@ -1,11 +1,7 @@
-use std::fs;
+use utilities;
 
 pub fn run() {
-    let contents = fs::read_to_string("test_files/day2/input.txt").unwrap();
-
-    let (part_1_result, part_2_result) = part_1_2_v2(&contents);
-
-    println!("[Day 2]: part 1: {part_1_result}, part 2: {part_2_result}");
+    utilities::run_puzzle(2, true, part_1, part_2);
 }
 
 fn _part_1_2(data: &str) -> (u32, u32) {
@@ -82,9 +78,12 @@ fn _part_1_2(data: &str) -> (u32, u32) {
     (sum, power)
 }
 
-fn part_1_2_v2(data: &str) -> (u32, u32) {
-    let mut sum = 0;
-    let mut power: u32 = 0;
+fn part_1(data: &str) -> u32 {
+    calc_score(data, true)
+}
+
+fn calc_score(data: &str, as_sum: bool) -> u32 {
+    let mut score: u32 = 0;
 
     for line in data.lines() {
         // line: Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
@@ -133,16 +132,22 @@ fn part_1_2_v2(data: &str) -> (u32, u32) {
             }
         }
 
-        if valid {
-            sum += num;
+        if valid && as_sum {
+            score += num;
         }
 
-        power += r_count * g_count * b_count;
+        if !as_sum {
+            score += r_count * g_count * b_count;
+        }
     }
 
     // println!("power {power}");
 
-    (sum, power)
+    score
+}
+
+fn part_2(data: &str) -> u32 {
+    calc_score(data, false)
 }
 
 // Was bored and tried to do another year.

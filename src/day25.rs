@@ -173,6 +173,6 @@ fn build_graph(data: &str) -> Graph {
     graph
 }
 
-fn part_2(data: &str) -> usize {
+fn part_2(_data: &str) -> usize {
     0
 }
