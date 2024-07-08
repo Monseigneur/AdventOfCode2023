@@ -1,12 +1,9 @@
 use std::collections::{HashMap, HashSet, VecDeque};
-use std::fs;
 
 use utilities;
 
 pub fn run() {
-    let contents = fs::read_to_string("test_files/day19/input.txt").unwrap();
-
-    utilities::print_results(19, || part_1(&contents), || part_2(&contents));
+    utilities::run_puzzle(19, true, part_1, part_2);
 }
 
 // The input contains instructions and part ratings, determine for each part if they are accepted or

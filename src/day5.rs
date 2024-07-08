@@ -1,12 +1,9 @@
-use std::fs;
 use std::str::Lines;
 
 use utilities;
 
 pub fn run() {
-    let contents = fs::read_to_string("test_files/day5/example.txt").unwrap();
-
-    utilities::print_results(5, || part_1(&contents), || part_2(&contents));
+    utilities::run_puzzle(5, true, part_1, part_2);
 }
 
 // Example data:

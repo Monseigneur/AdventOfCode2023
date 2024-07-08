@@ -1,13 +1,10 @@
 use std::collections::HashMap;
-use std::fs;
 use std::str::Lines;
 
 use utilities;
 
 pub fn run() {
-    let contents = fs::read_to_string("test_files/day8/input.txt").unwrap();
-
-    utilities::print_results(8, || part_1(&contents), || part_2(&contents));
+    utilities::run_puzzle(8, true, part_1, part_2);
 }
 
 fn part_1(data: &str) -> usize {

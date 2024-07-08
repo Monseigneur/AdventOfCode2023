@@ -1,11 +1,7 @@
-use std::fs;
-
 use utilities;
 
 pub fn run() {
-    let contents = fs::read_to_string("test_files/day13/input.txt").unwrap();
-
-    utilities::print_results(13, || part_1(&contents), || part_2(&contents));
+    utilities::run_puzzle(13, true, part_1, part_2);
 }
 
 // For each pattern, find the column or row of reflection, and then sum the number of columns

@@ -1,11 +1,7 @@
-use std::fs;
-
 use utilities;
 
 pub fn run() {
-    let contents = fs::read_to_string("test_files/day9/input.txt").unwrap();
-
-    utilities::print_results(9, || part_1(&contents), || part_2(&contents));
+    utilities::run_puzzle(9, true, part_1, part_2);
 }
 
 // The pattern seems like Pascal's triangle. It also seems like simple derivatives.

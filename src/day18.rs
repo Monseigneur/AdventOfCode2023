@@ -1,11 +1,7 @@
-use std::fs;
-
 use utilities;
 
 pub fn run() {
-    let contents = fs::read_to_string("test_files/day18/input.txt").unwrap();
-
-    utilities::print_results(18, || part_1(&contents), || part_2(&contents));
+    utilities::run_puzzle(18, true, part_1, part_2);
 }
 
 // Following the dig path, figure out the enclosed area. This seems like day 10 again.

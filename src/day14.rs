@@ -1,12 +1,9 @@
 use std::collections::HashMap;
-use std::fs;
 
 use utilities;
 
 pub fn run() {
-    let contents = fs::read_to_string("test_files/day14/input.txt").unwrap();
-
-    utilities::print_results(14, || part_1(&contents), || part_2(&contents));
+    utilities::run_puzzle(14, true, part_1, part_2);
 }
 
 type Data = Vec<Vec<char>>;

@@ -1,13 +1,10 @@
 use std::collections::HashMap;
 use std::collections::HashSet;
-use std::fs;
 
 use utilities;
 
 pub fn run() {
-    let contents = fs::read_to_string("test_files/day11/input.txt").unwrap();
-
-    utilities::print_results(11, || part_1(&contents), || part_2(&contents));
+    utilities::run_puzzle(11, true, part_1, part_2);
 }
 
 // Given a map of the galaxy containing . for empty space and # for galaxies, find the sum of all

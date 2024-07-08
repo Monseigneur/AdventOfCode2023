@@ -1,12 +1,8 @@
-use std::fs;
-
 use num::{BigRational, Signed, ToPrimitive, Zero};
 use utilities;
 
 pub fn run() {
-    let contents = fs::read_to_string("test_files/day24/input.txt").unwrap();
-
-    utilities::print_results(24, || part_1(&contents), || part_2(&contents));
+    utilities::run_puzzle(24, true, part_1, part_2);
 }
 
 // Given a list of hailstone positions and velocity vectors, calculate if their paths will intersect

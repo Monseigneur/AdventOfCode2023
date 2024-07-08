@@ -1,11 +1,7 @@
-use std::fs;
-
 use utilities;
 
 pub fn run() {
-    let contents = fs::read_to_string("test_files/day12/input.txt").unwrap();
-
-    utilities::print_results(12, || part_1(&contents), || part_2(&contents));
+    utilities::run_puzzle(12, true, part_1, part_2);
 }
 
 // Given a bunch of lines of data about springs, where each line contains the spring arrangement with

@@ -1,14 +1,9 @@
-use std::{
-    collections::{HashMap, HashSet, VecDeque},
-    fs,
-};
+use std::collections::{HashMap, HashSet, VecDeque};
 
 use utilities;
 
 pub fn run() {
-    let contents = fs::read_to_string("test_files/day20/input.txt").unwrap();
-
-    utilities::print_results(20, || part_1(&contents), || part_2(&contents));
+    utilities::run_puzzle(20, true, part_1, part_2);
 }
 
 // Given an arrangement of connected modules, calculate the product of low and high pulses that are sent

@@ -1,12 +1,10 @@
 use std::hash::Hash;
-use std::{collections::HashSet, collections::VecDeque, fs};
+use std::{collections::HashSet, collections::VecDeque};
 
 use utilities;
 
 pub fn run() {
-    let contents = fs::read_to_string("test_files/day16/input.txt").unwrap();
-
-    utilities::print_results(16, || part_1(&contents), || part_2(&contents));
+    utilities::run_puzzle(16, true, part_1, part_2);
 }
 
 type CharGrid = Vec<Vec<char>>;

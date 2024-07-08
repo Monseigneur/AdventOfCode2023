@@ -1,11 +1,7 @@
-use std::fs;
-
 use utilities;
 
 pub fn run() {
-    let contents = fs::read_to_string("test_files/day6/input.txt").unwrap();
-
-    utilities::print_results(6, || part_1(&contents), || part_2(&contents));
+    utilities::run_puzzle(6, true, part_1, part_2);
 }
 
 // This is an algebraic optimization problem. For a given race of time T and best distance B,

@@ -1,15 +1,10 @@
 use std::cmp::Reverse;
-use std::{
-    collections::{BinaryHeap, HashMap, HashSet},
-    fs,
-};
+use std::collections::{BinaryHeap, HashMap, HashSet};
 
 use utilities;
 
 pub fn run() {
-    let contents = fs::read_to_string("test_files/day25/input.txt").unwrap();
-
-    utilities::print_results(25, || part_1(&contents), || part_2(&contents));
+    utilities::run_puzzle(25, false, part_1, part_2)
 }
 
 type Graph = HashMap<String, HashSet<String>>;
@@ -177,10 +172,6 @@ fn build_graph(data: &str) -> Graph {
 
     graph
 }
-
-// Could use Karger's contraction algorithm:
-// Randomly select an edge and contract the endpoints into 1 node, connecting all edges to the new node.
-// When there are 2 nodes left, they are connected by the cut at that point. If num_edges == 3 -> done
 
 fn part_2(data: &str) -> usize {
     0

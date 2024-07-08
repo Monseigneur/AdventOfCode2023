@@ -2,14 +2,11 @@ use std::cmp::Reverse;
 use std::collections::BinaryHeap;
 use std::collections::HashMap;
 use std::collections::HashSet;
-use std::fs;
 
 use utilities;
 
 pub fn run() {
-    let contents = fs::read_to_string("test_files/day17/input.txt").unwrap();
-
-    utilities::print_results(17, || part_1(&contents), || part_2(&contents));
+    utilities::run_puzzle(17, true, part_1, part_2);
 }
 
 // A crucible must move from the top left corner to the bottom right, with a max of 3 blocks in any given

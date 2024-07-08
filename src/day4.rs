@@ -1,11 +1,9 @@
-use std::{collections::HashMap, collections::HashSet, fs};
+use std::{collections::HashMap, collections::HashSet};
 
 use utilities;
 
 pub fn run() {
-    let contents = fs::read_to_string("test_files/day4/input.txt").unwrap();
-
-    utilities::print_results(4, || part_1(&contents), || part_2(&contents));
+    utilities::run_puzzle(4, true, part_1, part_2);
 }
 
 fn part_1(data: &str) -> u32 {

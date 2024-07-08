@@ -1,13 +1,10 @@
 use std::collections::{HashMap, HashSet, VecDeque};
-use std::fs;
 use std::ops::Range;
 
 use utilities;
 
 pub fn run() {
-    let contents = fs::read_to_string("test_files/day22/input.txt").unwrap();
-
-    utilities::print_results(22, || part_1(&contents), || part_2(&contents));
+    utilities::run_puzzle(22, true, part_1, part_2);
 }
 
 // Given a list of bricks specified as pairs of (x, y, z) coordinates representing the ends, determine

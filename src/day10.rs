@@ -1,12 +1,9 @@
 use std::collections::HashMap;
-use std::fs;
 
 use utilities;
 
 pub fn run() {
-    let contents = fs::read_to_string("test_files/day10/input.txt").unwrap();
-
-    utilities::print_results(10, || part_1(&contents), || part_2(&contents));
+    utilities::run_puzzle(10, true, part_1, part_2);
 }
 
 #[derive(Debug)]

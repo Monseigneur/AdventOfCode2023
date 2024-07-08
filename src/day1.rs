@@ -1,11 +1,7 @@
-use std::fs;
-
 use utilities;
 
 pub fn run() {
-    let contents = fs::read_to_string("test_files/day1/input.txt").unwrap();
-
-    utilities::print_results(1, || part_1(&contents), || part_2(&contents));
+    utilities::run_puzzle(1, true, part_1, part_2);
 }
 
 // Sum of first_digit_in_line * 10 + last_digit_in_line for each line
